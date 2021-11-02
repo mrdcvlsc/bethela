@@ -1,44 +1,24 @@
-# imgcrypt
+# bethela
 
-### COMPILATION
-    - dependencies : OpenCV v3+ (above)
-    - cpp standard : -std=c++17
+A simple symmetric encrpytion
 
-## EXAMPLE ENCRYPTION
-
-### Folder Structure
-- images (the folder containing all images you want to work on)
-    - test1.png
-    - test2.jpg
-    - testLock.key (a generated key)
-    - encrypt (a subfolder that will contain all the encrypted images)
-
-### RUNNING THE PROGRAM
+#### encrypt command format:
 
 ```
-./img_crypt.o
-image$encryption : ~/Documents/images/ ENCRYPT testLock.key
+bethela --encrypt keyfile file1 file2 ... fileN
 ```
 
-_for decryption just change the 'ENCRYPT' command to 'DECRYPT', and change the subfolder 'encrypt' to 'decrypt'_
+#### decrypt command format:
 
-### OUTPUT
+```
+bethela --decrypt keyfile file1 file2 ... fileN
+```
+As you can see you can pass 1 or more files to the program
 
-- images
-    - test1.png
-    - test2.jpg
-    - testLock.key
-    - encrypt
-        - 0.png
-        - 1.png
 
-### COMMAND INPUT FORMAT
+#### generate key format:
 
-- Encryption ```image$encryption : DIRECTORY ENCRYPT KEYFILE```
-
-- Decryption ```image$encryption : DIRECTORY DECRYPT KEYFILE```
-
-- GENERATE KEY ```image$encryption : DIRECTORY GENERATE KEYFILE SIZE```
-
-*a folder named ```encrypt```/```decrypt``` should exist first inside the directory given before **encrypting/decrypting**. the ```keyfile``` should also be inside the given ```directory```. when generating a new keyfile it will be stored in the given directory*
-
+```
+bethela --generate keyfilename keysize
+```
+the **keysize** should be a positive number greater than 0
