@@ -10,8 +10,6 @@ A simple command line tool for symmetric encrpytion & decryption of files
 bethela --encrypt keyfile file1 file2 ... fileN
 ```
 
-----------------------------------------------------
-
 ### decrypt command format:
 
 ```
@@ -19,7 +17,6 @@ bethela --decrypt keyfile file1 file2 ... fileN
 ```
 As you can see you can pass 1 or more files to the program
 
-----------------------------------------------------
 
 ### generate key format:
 
