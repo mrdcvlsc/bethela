@@ -1,6 +1,8 @@
 # bethela
 
-A simple symmetric encrpytion
+----------------------------------------------------
+
+A simple command line tool for symmetric encrpytion & decryption of files 
 
 ----------------------------------------------------
 
