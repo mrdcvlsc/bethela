@@ -1,6 +1,6 @@
 # bethela
 
-A simple command line tool for symmetric encrpytion & decryption of files 
+A simple terminal command line tool for symmetric encrpytion & decryption of any files, this program uses **Vigenère cipher** on the target file's bytestream 
 
 ----------------------------------------------------
 
