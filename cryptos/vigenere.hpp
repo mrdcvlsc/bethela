@@ -1,33 +1,31 @@
-#ifndef BETHELA_CRYPTALGO_HPP
-#define BETHELA_CRYPTALGO_HPP
+#ifndef BETHELA_VIGENERE_HPP
+#define BETHELA_VIGENERE_HPP
 
 #include <iostream>
 #include <vector>
 
-#include "constants.hpp"
+#include "../constants.hpp"
 
-namespace lock
+/// Vigenère cipher
+namespace vigenere
 {
-    typedef unsigned char byte;
-    typedef std::vector<byte> bhstream;
-
     int ring(int add_or_sub_values)
     {
         int return_;
-        if(add_or_sub_values < bthconst::MIN)
+        if(add_or_sub_values < beth_const::MIN)
         {
-            return return_ = add_or_sub_values + (bthconst::MAX+1);
+            return return_ = add_or_sub_values + (beth_const::MAX+1);
         }
         
-        if(add_or_sub_values > bthconst::MAX+1)
+        if(add_or_sub_values > beth_const::MAX+1)
         {
-            return return_ = add_or_sub_values - (bthconst::MAX+1);
+            return return_ = add_or_sub_values - (beth_const::MAX+1);
         }
         
         return add_or_sub_values;
     }
 
-    void encrypt(bhstream& data, const bhstream& key)
+    void encrypt(beth_const::bytestream& data, const beth_const::bytestream& key)
     {
         size_t ikey = 0;
 
@@ -39,7 +37,7 @@ namespace lock
         }
     }
 
-    void decrypt(bhstream& data, const bhstream& key)
+    void decrypt(beth_const::bytestream& data, const beth_const::bytestream& key)
     {
         size_t ikey = 0;
 

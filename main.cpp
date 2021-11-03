@@ -3,7 +3,8 @@
 #include <chrono>
 
 #include "bethela_key.hpp"
-#include "readbinfile.hpp"
+#include "byteio.hpp"
+#include "cryptos/vigenere.hpp"
 
 #define BETHELA_VERSION "version 1.0"
 
@@ -49,7 +50,13 @@ int main(int argc, char* args[])
             size_t cnt = 0;
             for(size_t i=STARTING_FILE; i<argc; ++i)
             {
-                cnt += filemanage::encryptFile(args[i],loadKey);
+                // cnt += filemanage::encryptFile(args[i],loadKey);
+                beth_const::bytestream filebytestream = byteio::file_read(args[i]);
+                if(!filebytestream.empty())
+                {
+                    vigenere::encrypt(filebytestream,loadKey);
+                    cnt += byteio::file_write(args[i]+beth_const::extension,filebytestream);
+                }
             }
             auto end = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
@@ -71,7 +78,12 @@ int main(int argc, char* args[])
             size_t cnt = 0;
             for(size_t i=STARTING_FILE; i<argc; ++i)
             {
-                cnt += filemanage::decryptFile(args[i],loadKey);
+                beth_const::bytestream filebytestream = byteio::file_read(args[i]);
+                if(!filebytestream.empty())
+                {
+                    vigenere::decrypt(filebytestream,loadKey);
+                    cnt += byteio::file_write(args[i]+beth_const::extension,filebytestream);
+                }
             }
             auto end = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
