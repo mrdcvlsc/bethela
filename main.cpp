@@ -10,6 +10,8 @@
 #define HELP_FLAG "--help"
 #define ENCRYPT_FLAG "--encrypt"
 #define DECRYPT_FLAG "--decrypt"
+#define ENCRYPT_REPLACE_FLAG "--encrypt-replace"
+#define DECRYPT_REPLACE_FLAG "--decrypt-replace"
 #define GENERATE_FLAG "--generate"
 
 #define COMMAND 1
@@ -59,7 +61,6 @@ int main(int argc, char* args[])
             size_t cnt = 0;
             for(int i=STARTING_FILE; i<argc; ++i)
             {
-                // cnt += filemanage::encryptFile(args[i],loadKey);
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
@@ -89,6 +90,66 @@ int main(int argc, char* args[])
                     std::string output_filename(args[i]);
                     output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
                     cnt += byteio::file_write(output_filename,filebytestream);
+                }
+            }
+            TIMING_END("De");
+        }
+        else if(!strcmp(args[COMMAND],ENCRYPT_REPLACE_FLAG))
+        {
+            #ifndef RELEASE
+            std::cout << "Encrypt\n";
+            #endif
+
+            emptyFileArgs(args[COMMAND],argc);
+            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
+
+            TIMING_START;
+            size_t cnt = 0;
+            for(int i=STARTING_FILE; i<argc; ++i)
+            {
+                bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                if(!filebytestream.empty())
+                {
+                    vigenere::encrypt(filebytestream,loadKey);
+                    cnt += byteio::file_write(args[i]+bconst::extension,filebytestream);
+                    int file_not_removed = std::remove(args[i]);
+                    if(file_not_removed)
+                    {
+                        std::cout
+                            << "notice: The program cannot remove the file '" << args[i] << "'\n"
+                            << "        file location might be protected for delete actions.\n";    
+                    }
+                }
+            }
+            TIMING_END("En");
+        }
+        else if(!strcmp(args[COMMAND],DECRYPT_REPLACE_FLAG))
+        {
+            #ifndef RELEASE
+            std::cout << "Decrypt\n";
+            #endif
+
+            emptyFileArgs(args[COMMAND],argc);
+            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
+
+            TIMING_START;
+            size_t cnt = 0;
+            for(int i=STARTING_FILE; i<argc; ++i)
+            {
+                bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                if(!filebytestream.empty())
+                {
+                    vigenere::decrypt(filebytestream,loadKey);
+                    std::string output_filename(args[i]);
+                    output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
+                    cnt += byteio::file_write(output_filename,filebytestream);
+                    int file_not_removed = std::remove(args[i]);
+                    if(file_not_removed)
+                    {
+                        std::cout
+                            << "notice: The program cannot remove the file '" << args[i] << "'\n"
+                            << "        file location might be protected for delete actions.\n";    
+                    }
                 }
             }
             TIMING_END("De");
