@@ -24,3 +24,14 @@ As you can see you can pass 1 or more files to the program
 bethela --generate keyfilename keysize
 ```
 the **keysize** should be a positive number greater than 0
+
+
+### encrypt/decrypt with replace
+
+adding '-replace' command when encrypting/decrypting will
+replace the old files with the encrypted/decrypted files.
+
+```
+bethela --encrypt-replace keyfile file1 file2 ... fileN
+bethela --decrypt-replace keyfile file1 file2 ... fileN
+```

@@ -8,6 +8,7 @@
 #define BETHELA_VERSION "version 1.2"
 
 #define HELP_FLAG "--help"
+#define VERSION_FLAG "--version"
 #define ENCRYPT_FLAG "--encrypt"
 #define DECRYPT_FLAG "--decrypt"
 #define ENCRYPT_REPLACE_FLAG "--encrypt-replace"
@@ -50,10 +51,6 @@ int main(int argc, char* args[])
     {
         if(!strcmp(args[COMMAND],ENCRYPT_FLAG))
         {
-            #ifndef RELEASE
-            std::cout << "Encrypt\n";
-            #endif
-
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
 
@@ -72,10 +69,6 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],DECRYPT_FLAG))
         {
-            #ifndef RELEASE
-            std::cout << "Decrypt\n";
-            #endif
-
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
 
@@ -96,10 +89,6 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],ENCRYPT_REPLACE_FLAG))
         {
-            #ifndef RELEASE
-            std::cout << "Encrypt\n";
-            #endif
-
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
 
@@ -125,10 +114,6 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],DECRYPT_REPLACE_FLAG))
         {
-            #ifndef RELEASE
-            std::cout << "Decrypt\n";
-            #endif
-
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
 
@@ -156,10 +141,6 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],GENERATE_FLAG))
         {
-            #ifndef RELEASE
-            std::cout << "Generate\n";
-            #endif
-
             if(argc==2)
             {
                 std::cerr << "\n\tERROR: --generate can only be followed by the filename\n";
@@ -192,9 +173,10 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],HELP_FLAG))
         {
-            #ifndef RELEASE
-            std::cout <<
+            std::cerr <<
                 "\t--help menu\n\n"
+                "\tdisplay version:\n\n"
+                "\t\tbethela --version\n\n\n"
                 "\tencrypt command format:\n\n"
                 "\t\tbethela --encrypt keyfile file1 file2 ... fileN\n\n\n"
                 "\tdecrypt command format:\n\n"
@@ -202,20 +184,28 @@ int main(int argc, char* args[])
                 "\t\tAs you can see you can pass 1 or more files to the program\n\n\n"
                 "\tgenerate key format:\n\n"
                 "\t\tbethela --generate keyfilename keysize\n\n"
-                "\t\tthe key size should be a positive number greater than 0\n\n\n";
-            #endif
+                "\t\tthe key size should be a positive number greater than 0\n\n\n"
+                "\tadding '-replace' command when encrypting/decrypting will\n"
+                "\treplace the old files with the encrypted/decrypted files.\n\n"
+                "\t\tbethela --encrypt-replace keyfile file1 file2 ... fileN\n"
+                "\t\tbethela --decrypt-replace keyfile file1 file2 ... fileN\n\n\n";
+        }
+        else if(!strcmp(args[COMMAND],VERSION_FLAG))
+        {
+            std::cout << "bethela " << BETHELA_VERSION << "\n";
         }
         else
         {
-            #ifndef RELEASE
             std::cerr <<
                 "\n\tinvalid command, type the command below for info:\n\n"
-                "\t\tbethela --help\n\n";     
-            #endif
+                "\tbethela --help\n\n";
         }
     }
     else
     {
-        std::cout << "bethela " << BETHELA_VERSION << "\n";
+        std::cerr <<
+            "A simple terminal command line tool for symmetric\n"
+            "encrpytion & decryption of any files \n\n"
+            "for more info about this program input the command:\n\n\tbethela --help\n\n";
     }
 }
