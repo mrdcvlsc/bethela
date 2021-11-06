@@ -20,12 +20,12 @@ namespace keygen
         std::vector<T> writeData = filesig;
         writeData.insert(writeData.end(),arr.begin(), arr.end());
 
-        size_t limit = writeData.size();
-        write_bin.write(reinterpret_cast<char*>(&limit), sizeof(size_t));
+        int keylen_offset = writeData.size();
+        write_bin.write(reinterpret_cast<char*>(&keylen_offset), sizeof(int));
 
-        if (limit != 0)
+        if (keylen_offset != 0)
         {
-            write_bin.write(reinterpret_cast<const char*>(&writeData[0]), sizeof(T) * limit);
+            write_bin.write(reinterpret_cast<const char*>(&writeData[0]), sizeof(T) * keylen_offset);
         }
 
         write_bin.close();
@@ -41,10 +41,10 @@ namespace keygen
             exit(1);
         }
 
-        size_t limit;
-        read_bin.read(reinterpret_cast<char*>(&limit), sizeof(size_t));
+        int keylen_offset;
+        read_bin.read(reinterpret_cast<char*>(&keylen_offset), sizeof(int));
 
-        limit -= filesig.size();
+        keylen_offset -= filesig.size();
         std::vector<T> sigRead(filesig.size(),0);
         read_bin.read(reinterpret_cast<char*>(&sigRead[0]), sizeof(T) * filesig.size());
 
@@ -57,10 +57,10 @@ namespace keygen
             }
         }
 
-        std::vector<T> arr(limit, 0);
-        if (limit != 0)
+        std::vector<T> arr(keylen_offset, 0);
+        if (keylen_offset != 0)
         {
-            read_bin.read(reinterpret_cast<char*>(&arr[0]), sizeof(T) * limit);
+            read_bin.read(reinterpret_cast<char*>(&arr[0]), sizeof(T) * keylen_offset);
         }
 
         read_bin.close();
