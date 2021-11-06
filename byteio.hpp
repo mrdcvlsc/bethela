@@ -29,23 +29,23 @@ namespace byteio
     }
 
     /// returns an empty bytestream if the file cannot be opened, or non existing
-    beth_const::bytestream file_read(const std::string& filename)
+    bconst::bytestream file_read(const std::string& filename)
     {
         std::ifstream fileData(filename, std::ios::binary );
         if(!fileData.is_open())
         {
-            beth_const::bytestream empty_bytestream = {};
+            bconst::bytestream empty_bytestream = {};
             return empty_bytestream;
         }
-        beth_const::bytestream filebytestream(std::istreambuf_iterator<char>(fileData), {});
+        bconst::bytestream filebytestream(std::istreambuf_iterator<char>(fileData), {});
         return filebytestream;
     }
 
-    bool file_write(const std::string& outputfilename, const beth_const::bytestream& filebytestream)
+    bool file_write(const std::string& outputfilename, const bconst::bytestream& filebytestream)
     {
         std::ofstream fileData(outputfilename, std::ios::out | std::ios::binary);
         if(!fileData.is_open()) return false;
-        fileData.write((char*)&filebytestream[0], filebytestream.size() * sizeof(beth_const::byte));
+        fileData.write((char*)&filebytestream[0], filebytestream.size() * sizeof(bconst::byte));
         fileData.close();
         return true;
     }

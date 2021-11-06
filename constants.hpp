@@ -5,7 +5,7 @@
 #include <vector>
 
 // bethela constants and type namespace
-namespace beth_const
+namespace bconst
 {
     const static int MIN = 0;
     const static int MAX = 255;
@@ -14,6 +14,7 @@ namespace beth_const
     typedef std::vector<unsigned char> bytestream;
 
     const static std::string extension = ".bethela";
+    const static std::vector<byte> FILESIGNATURE({ 'B','E','T','H','E','L','A' });
 }
 
 #endif

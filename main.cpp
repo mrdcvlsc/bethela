@@ -2,7 +2,6 @@
 #include <cstring>
 #include <chrono>
 
-#include "bethela_key.hpp"
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
 
@@ -25,7 +24,7 @@ auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start)
 std::cout << NAME << "cryption took : \n"; \
 std::cout << "\t" << duration.count() << " milliseconds\n"; \
 std::cout << "\t" << duration.count()/1000 << " seconds\n"; \
-std::cout << "\t" << NAME << "\tcrypted File(s) : " << cnt << "\n"
+std::cout << "\t" << NAME << "crypted File(s) : " << cnt << "\n"
 
 void emptyFileArgs(char cmd[10], int argcnt)
 {
@@ -54,18 +53,18 @@ int main(int argc, char* args[])
             #endif
 
             emptyFileArgs(args[COMMAND],argc);
-            bethela::bhstream loadKey = bethela::readKey(args[KEY]);
+            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
 
             TIMING_START;
             size_t cnt = 0;
-            for(size_t i=STARTING_FILE; i<argc; ++i)
+            for(int i=STARTING_FILE; i<argc; ++i)
             {
                 // cnt += filemanage::encryptFile(args[i],loadKey);
-                beth_const::bytestream filebytestream = byteio::file_read(args[i]);
+                bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
                     vigenere::encrypt(filebytestream,loadKey);
-                    cnt += byteio::file_write(args[i]+beth_const::extension,filebytestream);
+                    cnt += byteio::file_write(args[i]+bconst::extension,filebytestream);
                 }
             }
             TIMING_END("En");
@@ -77,18 +76,18 @@ int main(int argc, char* args[])
             #endif
 
             emptyFileArgs(args[COMMAND],argc);
-            bethela::bhstream loadKey = bethela::readKey(args[KEY]);
+            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
 
             TIMING_START;
             size_t cnt = 0;
-            for(size_t i=STARTING_FILE; i<argc; ++i)
+            for(int i=STARTING_FILE; i<argc; ++i)
             {
-                beth_const::bytestream filebytestream = byteio::file_read(args[i]);
+                bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
                     vigenere::decrypt(filebytestream,loadKey);
                     std::string output_filename(args[i]);
-                    output_filename = output_filename.substr(0,output_filename.size()-beth_const::extension.size());
+                    output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
                     cnt += byteio::file_write(output_filename,filebytestream);
                 }
             }
@@ -121,7 +120,7 @@ int main(int argc, char* args[])
                     exit(1);
                 }
 
-                bethela::generateKey(args[KEY],keysize);
+                vigenere::generateKey(args[KEY],keysize);
                 std::cout<<"success - generated keyfile : "<<args[KEY]<<"\n";
             }
             else
