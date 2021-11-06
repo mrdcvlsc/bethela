@@ -10,11 +10,16 @@ all:
 	@echo "compiling executable..."
 
 ifeq ($(OS), Linux)
-	@g++ -static-libgcc -static-libstdc++ main.cpp -o ${EXECUTABLE} -O3
+	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE} -O3
 else
-	@g++ -static-libgcc -static-libstdc++ main.cpp -o ${EXECUTABLE}.exe -O3
+	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
+
+debug_linux:
+	@echo "compiling with warnings and fsanitize"
+	@g++ main.cpp -o ${EXECUTABLE} -Wall -Wextra -O3 -g -fsanitize=address
+	@echo "compiling done"
 
 install:
 ifeq ($(OS), Linux)
@@ -26,7 +31,7 @@ endif
 
 uninstall:
 ifeq ($(OS), Linux)
-	@rm ./${EXECUTABLE}
+	@rm ${INSTALLPATH}/${EXECUTABLE}
 else
 	@rm ./${EXECUTABLE}.exe
 endif
