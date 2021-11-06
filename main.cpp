@@ -6,6 +6,7 @@
 #include "cryptos/vigenere.hpp"
 
 #define BETHELA_VERSION "version 1.2"
+#define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
 #define VERSION_FLAG "--version"
@@ -192,7 +193,8 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],VERSION_FLAG))
         {
-            std::cout << "bethela " << BETHELA_VERSION << "\n";
+            int executable_bit = sizeof(size_t)==SIZE_T_32BIT ? 32 : 64;
+            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << "\n";
         }
         else
         {
