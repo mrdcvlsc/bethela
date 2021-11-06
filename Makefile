@@ -26,7 +26,7 @@ endif
 
 uninstall:
 ifeq ($(OS), Linux)
-	@rm ./${EXECUTABLE}
+	@rm ${INSTALLPATH}/${EXECUTABLE}
 else
 	@rm ./${EXECUTABLE}.exe
 endif

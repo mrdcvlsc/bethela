@@ -6,7 +6,7 @@
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
 
-#define BETHELA_VERSION "version 1.0"
+#define BETHELA_VERSION "version 1.2"
 
 #define HELP_FLAG "--help"
 #define ENCRYPT_FLAG "--encrypt"
@@ -16,6 +16,16 @@
 #define COMMAND 1
 #define KEY 2
 #define STARTING_FILE 3
+
+#define TIMING_START auto start = std::chrono::high_resolution_clock::now()
+
+#define TIMING_END(NAME) \
+auto end = std::chrono::high_resolution_clock::now(); \
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start); \
+std::cout << NAME << "cryption took : \n"; \
+std::cout << "\t" << duration.count() << " milliseconds\n"; \
+std::cout << "\t" << duration.count()/1000 << " seconds\n"; \
+std::cout << "\t" << NAME << "\tcrypted File(s) : " << cnt << "\n"
 
 void emptyFileArgs(char cmd[10], int argcnt)
 {
@@ -46,7 +56,7 @@ int main(int argc, char* args[])
             emptyFileArgs(args[COMMAND],argc);
             bethela::bhstream loadKey = bethela::readKey(args[KEY]);
 
-            auto start = std::chrono::high_resolution_clock::now();
+            TIMING_START;
             size_t cnt = 0;
             for(size_t i=STARTING_FILE; i<argc; ++i)
             {
@@ -58,12 +68,7 @@ int main(int argc, char* args[])
                     cnt += byteio::file_write(args[i]+beth_const::extension,filebytestream);
                 }
             }
-            auto end = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
-            std::cout << "Encryption took : \n";
-            std::cout << "\t" << duration.count() << " milliseconds\n";
-            std::cout << "\t" << duration.count()/1000 << " seconds\n";
-            std::cout << "\tEncrypted File(s) : " << cnt << "\n";
+            TIMING_END("En");
         }
         else if(!strcmp(args[COMMAND],DECRYPT_FLAG))
         {
@@ -74,7 +79,7 @@ int main(int argc, char* args[])
             emptyFileArgs(args[COMMAND],argc);
             bethela::bhstream loadKey = bethela::readKey(args[KEY]);
 
-            auto start = std::chrono::high_resolution_clock::now();
+            TIMING_START;
             size_t cnt = 0;
             for(size_t i=STARTING_FILE; i<argc; ++i)
             {
@@ -82,15 +87,12 @@ int main(int argc, char* args[])
                 if(!filebytestream.empty())
                 {
                     vigenere::decrypt(filebytestream,loadKey);
-                    cnt += byteio::file_write(args[i]+beth_const::extension,filebytestream);
+                    std::string output_filename(args[i]);
+                    output_filename = output_filename.substr(0,output_filename.size()-beth_const::extension.size());
+                    cnt += byteio::file_write(output_filename,filebytestream);
                 }
             }
-            auto end = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
-            std::cout << "Decryption took : \n";
-            std::cout << "\t" << duration.count() << " milliseconds\n";
-            std::cout << "\t" << duration.count()/1000 << " seconds\n";
-            std::cout << "Decrypted File(s) : " << cnt << "\n";
+            TIMING_END("De");
         }
         else if(!strcmp(args[COMMAND],GENERATE_FLAG))
         {

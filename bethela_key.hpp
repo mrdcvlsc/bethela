@@ -23,7 +23,7 @@ namespace bethela
 
         unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
         std::mt19937_64 rand_engine(seed);
-        std::uniform_int_distribution<int> random_number(bthconst::MIN,bthconst::MAX);
+        std::uniform_int_distribution<int> random_number(beth_const::MIN,beth_const::MAX);
 
         for(size_t i=0; i<keysize; ++i)
             new_key.push_back(random_number(rand_engine));
