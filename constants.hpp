@@ -9,6 +9,7 @@ namespace bconst
 {
     const static int MIN = 0;
     const static int MAX = 255;
+    const static int CHARSETS = 256;
 
     typedef unsigned char byte;
     typedef std::vector<unsigned char> bytestream;

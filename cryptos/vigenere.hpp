@@ -12,29 +12,13 @@
 /// Vigenère cipher
 namespace vigenere
 {
-    int ring(int add_or_sub_values)
-    {
-        int return_;
-        if(add_or_sub_values < bconst::MIN)
-        {
-            return return_ = add_or_sub_values + (bconst::MAX+1);
-        }
-        
-        if(add_or_sub_values > bconst::MAX+1)
-        {
-            return return_ = add_or_sub_values - (bconst::MAX+1);
-        }
-        
-        return add_or_sub_values;
-    }
-
     void encrypt(bconst::bytestream& data, const bconst::bytestream& key)
     {
         size_t ikey = 0;
 
         for(size_t i=0; i<data.size(); ++i)
         {
-            data[i] = ring((int)data[i]+(int)key[ikey]);
+            data[i] = ((int)data[i]+(int)key[ikey])%bconst::CHARSETS;
             ikey++;
             if(ikey>=key.size()) ikey = 0;
         }
@@ -46,7 +30,7 @@ namespace vigenere
 
         for(size_t i=0; i<data.size(); ++i)
         {
-            data[i] = ring((int)data[i]-(int)key[ikey]);
+            data[i] = ((int)data[i]-(int)key[ikey])%bconst::CHARSETS;
             ikey++;
             if(ikey==key.size()) ikey = 0;
         }
