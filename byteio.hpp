@@ -49,6 +49,15 @@ namespace byteio
         fileData.close();
         return true;
     }
+
+    bool file_write(const std::string& outputfilename, bconst::byte* filebytestream, size_t length)
+    {
+        std::ofstream fileData(outputfilename, std::ios::out | std::ios::binary);
+        if(!fileData.is_open()) return false;
+        fileData.write((char*)&filebytestream[0], length * sizeof(bconst::byte));
+        fileData.close();
+        return true;
+    }
 }
 
 #endif

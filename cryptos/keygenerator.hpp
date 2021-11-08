@@ -89,6 +89,30 @@ namespace keygen
     {
         return keygen::read<bconst::byte>(keyfile,bconst::FILESIGNATURE);
     }
+
+    bconst::bytestream random_bytestream(size_t byte_count)
+    {
+        bconst::bytestream random_bytes;
+        random_bytes.reserve(byte_count);
+
+        unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+        std::mt19937_64 rand_engine(seed);
+        std::uniform_int_distribution<int> random_number(bconst::MIN,bconst::MAX);
+
+        for(size_t i=0; i<byte_count; ++i)
+            random_bytes.push_back(random_number(rand_engine));
+
+        return random_bytes;
+    }
+
+    void AES_KEYCHECK(const bconst::bytestream& AES_KEY)
+    {
+        if(AES_KEY.size()!=32)
+        {
+            std::cerr << "\n\tERROR: bad key!\n\n";
+            exit(1);
+        };
+    }
 }
 
 #endif
