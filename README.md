@@ -2,6 +2,11 @@
 
 A simple terminal command line tool for symmetric encrpytion & decryption of any files
 
+### install in linux
+
+```
+```
+
 ----------------------------------------------------
 
 ### encrypt command format:
