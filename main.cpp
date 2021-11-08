@@ -4,6 +4,7 @@
 
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
+#include "cryptos/AES/src/AES.h"
 
 #define BETHELA_VERSION "version 1.3"
 #define SIZE_T_32BIT 4
@@ -53,7 +54,7 @@ int main(int argc, char* args[])
         if(!strcmp(args[COMMAND],ENCRYPT_FLAG))
         {
             emptyFileArgs(args[COMMAND],argc);
-            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
+            bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
             TIMING_START;
             size_t cnt = 0;
@@ -71,7 +72,7 @@ int main(int argc, char* args[])
         else if(!strcmp(args[COMMAND],DECRYPT_FLAG))
         {
             emptyFileArgs(args[COMMAND],argc);
-            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
+            bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
             TIMING_START;
             size_t cnt = 0;
@@ -91,7 +92,7 @@ int main(int argc, char* args[])
         else if(!strcmp(args[COMMAND],ENCRYPT_REPLACE_FLAG))
         {
             emptyFileArgs(args[COMMAND],argc);
-            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
+            bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
             TIMING_START;
             size_t cnt = 0;
@@ -116,7 +117,7 @@ int main(int argc, char* args[])
         else if(!strcmp(args[COMMAND],DECRYPT_REPLACE_FLAG))
         {
             emptyFileArgs(args[COMMAND],argc);
-            bconst::bytestream loadKey = vigenere::readKey(args[KEY]);
+            bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
             TIMING_START;
             size_t cnt = 0;
@@ -163,7 +164,7 @@ int main(int argc, char* args[])
                     exit(1);
                 }
 
-                vigenere::generateKey(args[KEY],keysize);
+                keygen::generateKey(args[KEY],keysize);
                 std::cout<<"success - generated keyfile : "<<args[KEY]<<"\n";
             }
             else
