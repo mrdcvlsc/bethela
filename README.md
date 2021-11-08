@@ -39,3 +39,10 @@ replace the old files with the encrypted/decrypted files.
 bethela --encrypt-replace keyfile file1 file2 ... fileN
 bethela --decrypt-replace keyfile file1 file2 ... fileN
 ```
+
+<br>
+
+### for more information
+```
+bethela --help
+```
