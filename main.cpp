@@ -6,7 +6,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/AES_SergeyBel.hpp"
 
-#define BETHELA_VERSION "version 1.3"
+#define BETHELA_VERSION "version 1.7"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
