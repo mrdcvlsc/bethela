@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <chrono>
+#include <omp.h>
 
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
@@ -24,7 +25,8 @@
 #define KEY 2
 #define STARTING_FILE 3
 
-#define TIMING_START auto start = std::chrono::high_resolution_clock::now()
+#define TIMING_START std::cout << "program running, please wait...\n"; \
+auto start = std::chrono::high_resolution_clock::now()
 
 #define TIMING_END(NAME) \
 auto end = std::chrono::high_resolution_clock::now(); \
@@ -126,6 +128,8 @@ int main(int argc, char* args[])
 
             TIMING_START;
             size_t cnt = 0;
+
+            #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
@@ -155,15 +159,16 @@ int main(int argc, char* args[])
             
             TIMING_START;
             size_t cnt = 0;
+
+            #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
                     bconst::bytestream iv(filebytestream.end()-AES256_BYTEKEY,filebytestream.end());
-                    filebytestream.erase(filebytestream.end()-AES256_BYTEKEY,filebytestream.end());
                     SergeyBel::AES crypt;
-                    unsigned int output_len = filebytestream.size();
+                    unsigned int output_len = filebytestream.size()-iv.size();
 
                     bconst::byte* decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,loadKey.data(),iv.data());
                     

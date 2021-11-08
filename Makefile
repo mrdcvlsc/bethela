@@ -11,7 +11,7 @@ all:
 	@echo "compiling executable..."
 
 ifeq ($(OS), Linux)
-	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp ${AES_SRC} -o ${EXECUTABLE} -O3
+	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp ${AES_SRC} -o ${EXECUTABLE} -fopenmp -O3 -march=native
 else
 	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp ${AES_SRC} -o ${EXECUTABLE}.exe -O3
 endif
