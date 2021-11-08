@@ -4,8 +4,24 @@ A simple terminal command line tool for symmetric encrpytion & decryption of any
 
 ### install in linux
 
+<ul>
+  
 ```
+wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v1.7.tar.gz
+tar -xf v1.7.tar.gz
+cd bethela-1.7
+make
+make install
 ```
+or
+```
+git clone https://github.com/mrdcvlsc/bethela.git
+cd bethela
+make
+make install
+```
+  
+</ul>
 
 ----------------------------------------------------
 
