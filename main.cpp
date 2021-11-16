@@ -126,6 +126,9 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey);
 
+            SergeyBel::AES crypt;
+            crypt.KeyExpansion(loadKey.data());
+
             TIMING_START;
             size_t cnt = 0;
 
@@ -136,10 +139,9 @@ int main(int argc, char* args[])
                 if(!filebytestream.empty())
                 {
                     bconst::bytestream iv = keygen::random_bytestream(AES256_BYTEKEY);
-                    SergeyBel::AES crypt;
                     unsigned int output_len = 0;
 
-                    bconst::byte* encrypt_raw = crypt.EncryptCBC(filebytestream.data(),filebytestream.size(),loadKey.data(),iv.data(),output_len);
+                    bconst::byte* encrypt_raw = crypt.EncryptCBC(filebytestream.data(),filebytestream.size(),iv.data(),output_len);
                     bconst::bytestream encrypted(encrypt_raw,encrypt_raw+output_len);
                     encrypted.insert(encrypted.end(),iv.begin(),iv.end());
 
@@ -157,6 +159,9 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey);
             
+            SergeyBel::AES crypt;
+            crypt.KeyExpansion(loadKey.data());
+
             TIMING_START;
             size_t cnt = 0;
 
@@ -167,10 +172,9 @@ int main(int argc, char* args[])
                 if(!filebytestream.empty())
                 {
                     bconst::bytestream iv(filebytestream.end()-AES256_BYTEKEY,filebytestream.end());
-                    SergeyBel::AES crypt;
                     unsigned int output_len = filebytestream.size()-iv.size();
 
-                    bconst::byte* decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,loadKey.data(),iv.data());
+                    bconst::byte* decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,iv.data());
                     
                     std::string output_filename(args[i]);
                     output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
