@@ -468,6 +468,7 @@ void AES::MixSingleColumn(unsigned char *r)
 /* Performs the mix columns step. Theory from: https://en.wikipedia.org/wiki/Advanced_Encryption_Standard#The_MixColumns_step */
 void AES::MixColumns(unsigned char** state) 
 {
+  #ifndef EXPERIMENTAL
   unsigned char *temp = new unsigned char[4];
 
   for(int i = 0; i < 4; ++i)
@@ -483,6 +484,33 @@ void AES::MixColumns(unsigned char** state)
     }
   }
   delete[] temp;
+  #else
+  unsigned char temp_state[4][4]; // <- please don't put this on heap if there is no error at the first place, because its faster this way
+
+  for(size_t i=0; i<4; ++i)
+  {
+    memset(temp_state[i],0,4);
+  }
+
+  for(size_t i=0; i<4; ++i)
+  {
+    for(size_t k=0; k<4; ++k)
+    {
+      for(size_t j=0; j<4; ++j)
+      {
+        if(CMDS[i][k]==1)
+          temp_state[i][j] ^= state[k][j];
+        else
+          temp_state[i][j] ^= GF_MUL_TABLE[CMDS[i][k]][state[k][j]];
+        }
+      }
+  }
+
+  for(size_t i=0; i<4; ++i)
+  {
+    memcpy(state[i],temp_state[i],4);
+  }
+  #endif
 }
 
 void AES::AddRoundKey(unsigned char **state, unsigned char *key)
@@ -670,6 +698,7 @@ unsigned char AES::mul_bytes(unsigned char a, unsigned char b) // multiplication
 
 void AES::InvMixColumns(unsigned char **state)
 {
+  #ifndef EXPERIMENTAL
   unsigned char s[4], s1[4];
   int i, j;
 
@@ -689,6 +718,30 @@ void AES::InvMixColumns(unsigned char **state)
       state[i][j] = s1[i];
     }
   }
+  #else
+  unsigned char temp_state[4][4]; // <- please don't put this on heap if there is no error at the first place, because its faster this way
+
+  for(size_t i=0; i<4; ++i)
+  {
+    memset(temp_state[i],0,4);
+  }
+
+  for(size_t i=0; i<4; ++i)
+  {
+    for(size_t k=0; k<4; ++k)
+    {
+      for(size_t j=0; j<4; ++j)
+      {
+          temp_state[i][j] ^= GF_MUL_TABLE[INV_CMDS[i][k]][state[k][j]];
+      }
+    }
+  }
+
+  for(size_t i=0; i<4; ++i)
+  {
+    memcpy(state[i],temp_state[i],4);
+  }
+  #endif
 }
 
 void AES::InvShiftRows(unsigned char **state)
@@ -731,73 +784,73 @@ void AES::printHexArray (unsigned char a[], unsigned int n)
 	}
 }
 
-void AES::printHexVector (std::vector<unsigned char> a)
+void AES::printHexVector (vector<unsigned char> a)
 {
 	for (unsigned int i = 0; i < a.size(); i++) {
 	  printf("%02x ", a[i]);
 	}
 }
 
-std::vector<unsigned char> AES::ArrayToVector(unsigned char *a, unsigned char len)
+vector<unsigned char> AES::ArrayToVector(unsigned char *a, unsigned char len)
 {
-   std::vector<unsigned char> v(a, a + len * sizeof(unsigned char));
+   vector<unsigned char> v(a, a + len * sizeof(unsigned char));
    return v;
 }
 
-unsigned char *AES::VectorToArray(std::vector<unsigned char> a)
+unsigned char *AES::VectorToArray(vector<unsigned char> a)
 {
   return a.data();
 }
 
 
-std::vector<unsigned char> AES::EncryptECB(std::vector<unsigned char> in, std::vector<unsigned char> key)
+vector<unsigned char> AES::EncryptECB(vector<unsigned char> in, vector<unsigned char> key)
 {
   unsigned int outLen = 0;;
   unsigned char *out = EncryptECB(VectorToArray(in), (unsigned int)in.size(), VectorToArray(key), outLen);
-  std::vector<unsigned char> v = ArrayToVector(out, outLen);
+  vector<unsigned char> v = ArrayToVector(out, outLen);
   delete []out;
   return v;
 }
 
-std::vector<unsigned char> AES::DecryptECB(std::vector<unsigned char> in, std::vector<unsigned char> key)
+vector<unsigned char> AES::DecryptECB(vector<unsigned char> in, vector<unsigned char> key)
 {
   unsigned char *out = DecryptECB(VectorToArray(in), (unsigned int)in.size(), VectorToArray(key));
-  std::vector<unsigned char> v = ArrayToVector(out, (unsigned int)in.size());
+  vector<unsigned char> v = ArrayToVector(out, (unsigned int)in.size());
   delete []out;
   return v;
 }
 
 
-std::vector<unsigned char> AES::EncryptCBC(std::vector<unsigned char> in, std::vector<unsigned char> key, std::vector<unsigned char> iv)
+vector<unsigned char> AES::EncryptCBC(vector<unsigned char> in, vector<unsigned char> key, vector<unsigned char> iv)
 {
   unsigned int outLen = 0;
   unsigned char *out = EncryptCBC(VectorToArray(in), (unsigned int)in.size(), VectorToArray(key), VectorToArray(iv),  outLen);
-  std::vector<unsigned char> v = ArrayToVector(out, outLen);
+  vector<unsigned char> v = ArrayToVector(out, outLen);
   delete [] out;
   return v;
 }
 
-std::vector<unsigned char> AES::DecryptCBC(std::vector<unsigned char> in, std::vector<unsigned char> key, std::vector<unsigned char> iv)
+vector<unsigned char> AES::DecryptCBC(vector<unsigned char> in, vector<unsigned char> key, vector<unsigned char> iv)
 {
   unsigned char *out = DecryptCBC(VectorToArray(in), (unsigned int)in.size(), VectorToArray(key), VectorToArray(iv));
-  std::vector<unsigned char> v = ArrayToVector(out, (unsigned int)in.size());
+  vector<unsigned char> v = ArrayToVector(out, (unsigned int)in.size());
   delete [] out;
   return v;
 }
 
- std::vector<unsigned char> AES::EncryptCFB(std::vector<unsigned char> in, std::vector<unsigned char> key, std::vector<unsigned char> iv)
+ vector<unsigned char> AES::EncryptCFB(vector<unsigned char> in, vector<unsigned char> key, vector<unsigned char> iv)
 {
   unsigned int outLen = 0;
   unsigned char *out = EncryptCFB(VectorToArray(in), (unsigned int)in.size(), VectorToArray(key), VectorToArray(iv),  outLen);
-  std::vector<unsigned char> v = ArrayToVector(out, outLen);
+  vector<unsigned char> v = ArrayToVector(out, outLen);
   delete [] out;
   return v;
 }
 
-std::vector<unsigned char> AES::DecryptCFB(std::vector<unsigned char> in, std::vector<unsigned char> key, std::vector<unsigned char> iv)
+vector<unsigned char> AES::DecryptCFB(vector<unsigned char> in, vector<unsigned char> key, vector<unsigned char> iv)
 {
   unsigned char *out = DecryptCFB(VectorToArray(in), (unsigned int)in.size(), VectorToArray(key), VectorToArray(iv));
-  std::vector<unsigned char> v = ArrayToVector(out, (unsigned int)in.size());
+  vector<unsigned char> v = ArrayToVector(out, (unsigned int)in.size());
   delete [] out;
   return v;
 
