@@ -18,9 +18,7 @@ class AES
   int Nk;
   int Nr;
 
-  #ifdef EXPERIMENTAL
   unsigned char *RoundedKeys;
-  #endif
 
   unsigned int blockBytesLen;
 
@@ -31,8 +29,6 @@ class AES
   void ShiftRows(unsigned char **state);
 
   unsigned char xtime(unsigned char b);    // multiply on x
-
-  unsigned char mul_bytes(unsigned char a, unsigned char b);
 
   void MixColumns(unsigned char **state);
 
@@ -81,12 +77,10 @@ public:
   unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, unsigned char key[], unsigned char *iv, unsigned int &outLen);
   unsigned char *DecryptCFB(unsigned char in[], unsigned int inLen, unsigned char key[], unsigned char *iv);
 
-  #ifdef EXPERIMENTAL
-  /*  
+  /* --------------------------------------------------------------------------------------- */ /*
     The set of functions below does not perform key expansion inside them,
     instead they used the member variable 'RoundedKeys', this member vairable
-    should be initialized first by calling the AES::KeyExpansion(unsigned char key[]) first
-  */
+    should be initialized first by calling the AES::KeyExpansion(unsigned char key[]) first  */
   void KeyExpansion(unsigned char key[]);
 
   unsigned char *EncryptECB(unsigned char in[], unsigned int inLen, unsigned int &outLen);
@@ -95,7 +89,8 @@ public:
   unsigned char *DecryptCBC(unsigned char in[], unsigned int inLen, unsigned char *iv);
   unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, unsigned char *iv, unsigned int &outLen);
   unsigned char *DecryptCFB(unsigned char in[], unsigned int inLen, unsigned char *iv);
-  #endif
+
+  /* --------------------------------------------------------------------------------------- */
 
   vector<unsigned char> EncryptECB(vector<unsigned char> in, vector<unsigned char> key);
 
@@ -184,7 +179,6 @@ const unsigned char inv_sbox[16][16] = {
     0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26,
     0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d, };
 
-#ifdef EXPERIMENTAL
 /// Galois Multiplication lookup tables
 static const unsigned char GF_MUL_TABLE[15][256] =
 {
@@ -334,6 +328,5 @@ static const unsigned char INV_CMDS[4][4] =
     {13,9,14,11},
     {11,13,9,14}
 };
-#endif
 
 #endif
