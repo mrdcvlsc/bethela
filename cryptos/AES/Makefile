@@ -1,3 +1,5 @@
+########################## DOCKER ##########################
+
 FLAGS = -Wall -Wextra
 
 build_all: clean build_test build_debug build_profile build_release
@@ -29,3 +31,40 @@ release:
 clean:
 	docker-compose exec aes rm -rf bin 
 	docker-compose exec aes mkdir bin -p
+
+########################## CLASSIC MAKEFILE ##########################
+
+gh_workflow:
+	mkdir bin
+	make compile_test
+	make run_test
+
+compile_all: clean compile_test compile_debug compile_profile compile_release
+
+compile_test:
+	g++ $(FLAGS) -g ./tests/tests.cpp -D CLASSIC_MAKE -lgtest -lpthread -fsanitize=address -o bin/test
+
+compile_debug:
+	g++ $(FLAGS) -g ./dev/main.cpp -o bin/debug
+
+compile_profile:
+	g++ $(FLAGS) -pg ./dev/main.cpp -o bin/profile
+
+compile_release:
+	g++ $(FLAGS) -O2 ./dev/main.cpp -o bin/release
+
+run_test:
+	bin/test
+
+run_debug:
+	bin/debug
+
+run_profile:
+	bin/profile
+
+run_release:
+	bin/release
+
+run_clean:
+	rm -rf bin
+	mkdir bin -p

@@ -7,7 +7,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/AES_SergeyBel.hpp"
 
-#define BETHELA_VERSION "version 2.0.1"
+#define BETHELA_VERSION "version 2.3.2"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -126,7 +126,7 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey);
 
-            SergeyBel::AES crypt;
+            MyFork::Cipher::AES crypt;
             crypt.KeyExpansion(loadKey.data());
 
             TIMING_START;
@@ -159,7 +159,7 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey);
             
-            SergeyBel::AES crypt;
+            MyFork::Cipher::AES crypt;
             crypt.KeyExpansion(loadKey.data());
 
             TIMING_START;

@@ -1,7 +1,15 @@
+#ifndef CLASSIC_MAKE
 #include "gtest/gtest.h"
+#else
+#include <gtest/gtest.h>
+#endif
+
 #include <iostream>
 #include <vector>
 #include "../src/AES.h"
+
+using namespace Cipher;
+using namespace std;
 
 const unsigned int BLOCK_BYTES_LENGTH = 16 * sizeof(unsigned char);
 

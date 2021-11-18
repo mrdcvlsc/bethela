@@ -1,7 +1,10 @@
 # AES
+
+Forked From : https://github.com/SergeyBel/AES
+
 C++ AES(Advanced Encryption Standard) implementation  
  
-![Build Status](https://travis-ci.org/SergeyBel/AES.svg?branch=master)
+![Tests](https://github.com/mrdcvlsc/AES/actions/workflows/google-test.yml/badge.svg)
 
 
 **This class is very simple to use:**
@@ -41,7 +44,7 @@ https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 
 http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
 
-
+<!--
 **Development:**
 1. `git clone https://github.com/SergeyBel/AES.git`
 1. `docker-compose build`
@@ -66,3 +69,4 @@ Build commands:
 * `make profile` - run profile version
 * `make release` - run `release` version
 * `make clean` - clean `bin` directory
+-->
