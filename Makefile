@@ -12,13 +12,14 @@ all:
 ifeq ($(OS), Linux)
 	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE} -fopenmp -O3 -march=native
 else
+	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
 	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
-	g++ main.cpp -o ${EXECUTABLE} -Wall -Wextra -O3 -g -fsanitize=address
+	g++ main.cpp -o ${EXECUTABLE} -Wall -Wextra -Og -fopenmp -g -fsanitize=address
 	@echo "compiling done"
 
 install:
