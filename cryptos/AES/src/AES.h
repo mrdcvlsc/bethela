@@ -8,6 +8,8 @@
 
 namespace Cipher
 {
+    #define AES_BLOCK_LEN 16
+    #define Nb 4
     typedef unsigned char byte;
     typedef std::vector<byte> bytestream;
 
@@ -16,12 +18,10 @@ namespace Cipher
     
     private:
 
-        int Nb;
         int Nk;
         int Nr;
 
         unsigned char *RoundedKeys;
-        unsigned int blockBytesLen;
 
         void SubBytes(unsigned char state[4][4]);
         void InvSubBytes(unsigned char state[4][4]);
