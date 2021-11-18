@@ -279,14 +279,9 @@ unsigned int AES::GetPaddingLength(unsigned int len)
 
 void AES::EncryptBlock(unsigned char in[], unsigned char out[], unsigned  char *roundKeys)
 {
-  unsigned char **state = new unsigned char *[4];
-  state[0] = new unsigned  char[4 * Nb];
+  unsigned char state[4][4];
+  
   int i, j, round;
-  for (i = 0; i < 4; i++)
-  {
-    state[i] = state[0] + Nb * i;
-  }
-
 
   for (i = 0; i < 4; i++)
   {
@@ -324,14 +319,9 @@ void AES::EncryptBlock(unsigned char in[], unsigned char out[], unsigned  char *
 
 void AES::DecryptBlock(unsigned char in[], unsigned char out[], unsigned  char *roundKeys)
 {
-  unsigned char **state = new unsigned char *[4];
-  state[0] = new unsigned  char[4 * Nb];
+  unsigned char state[4][4];
+  
   int i, j, round;
-  for (i = 0; i < 4; i++)
-  {
-    state[i] = state[0] + Nb * i;
-  }
-
 
   for (i = 0; i < 4; i++)
   {
@@ -360,13 +350,10 @@ void AES::DecryptBlock(unsigned char in[], unsigned char out[], unsigned  char *
       out[i + 4 * j] = state[i][j];
     }
   }
-
-  delete[] state[0];
-  delete[] state;
 }
 
 
-void AES::SubBytes(unsigned char **state)
+void AES::SubBytes(unsigned char state[4][4])
 {
   int i, j;
   unsigned char t;
@@ -380,7 +367,7 @@ void AES::SubBytes(unsigned char **state)
   }
 }
 
-void AES::ShiftRows(unsigned char **state)
+void AES::ShiftRows(unsigned char state[4][4])
 {
   //row 2
   unsigned char buffer = state[1][0];
@@ -404,7 +391,7 @@ unsigned char AES::xtime(unsigned char b)    // multiply on x
   return (b << 1) ^ (((b >> 7) & 1) * 0x1b);
 }
 
-void AES::MixColumns(unsigned char** state) 
+void AES::MixColumns(unsigned char state[4][4]) 
 {
   unsigned char temp_state[4][4]; // <- please don't put this on heap if there is no error at the first place, because its faster this way
 
@@ -433,7 +420,7 @@ void AES::MixColumns(unsigned char** state)
   }
 }
 
-void AES::AddRoundKey(unsigned char **state, unsigned char *key)
+void AES::AddRoundKey(unsigned char state[4][4], unsigned char *key)
 {
   int i, j;
   for (i = 0; i < 4; i++)
@@ -574,7 +561,7 @@ void AES::KeyExpansion(unsigned char key[])
   RoundedKeys = w;
 }
 
-void AES::InvSubBytes(unsigned char **state)
+void AES::InvSubBytes(unsigned char state[4][4])
 {
   int i, j;
   unsigned char t;
@@ -588,7 +575,7 @@ void AES::InvSubBytes(unsigned char **state)
   }
 }
 
-void AES::InvMixColumns(unsigned char **state)
+void AES::InvMixColumns(unsigned char state[4][4])
 {
   unsigned char temp_state[4][4]; // <- please don't put this on heap if there is no error at the first place, because its faster this way
 
@@ -614,7 +601,7 @@ void AES::InvMixColumns(unsigned char **state)
   }
 }
 
-void AES::InvShiftRows(unsigned char **state)
+void AES::InvShiftRows(unsigned char state[4][4])
 {
   //row 2
   unsigned char buffer = state[1][3];

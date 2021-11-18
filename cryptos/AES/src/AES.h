@@ -22,19 +22,15 @@ class AES
 
   unsigned int blockBytesLen;
 
-  void SubBytes(unsigned char **state);
+  void SubBytes(unsigned char state[4][4]);
 
-  void ShiftRow(unsigned char **state, int i, int n);    // shift row i on n positions
-
-  void ShiftRows(unsigned char **state);
+  void ShiftRows(unsigned char state[4][4]);
 
   unsigned char xtime(unsigned char b);    // multiply on x
 
-  void MixColumns(unsigned char **state);
+  void MixColumns(unsigned char state[4][4]);
 
-  void MixSingleColumn(unsigned char *r);
-
-  void AddRoundKey(unsigned char **state, unsigned char *key);
+  void AddRoundKey(unsigned char state[4][4], unsigned char *key);
 
   void SubWord(unsigned char *a);
 
@@ -44,11 +40,11 @@ class AES
 
   void Rcon(unsigned char * a, int n);
 
-  void InvSubBytes(unsigned char **state);
+  void InvSubBytes(unsigned char state[4][4]);
 
-  void InvMixColumns(unsigned char **state);
+  void InvMixColumns(unsigned char state[4][4]);
 
-  void InvShiftRows(unsigned char **state);
+  void InvShiftRows(unsigned char state[4][4]);
 
   unsigned char* PaddingNulls(unsigned char in[], unsigned int inLen, unsigned int alignLen);
   
