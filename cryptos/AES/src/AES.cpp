@@ -312,9 +312,6 @@ void AES::EncryptBlock(unsigned char in[], unsigned char out[], unsigned  char *
       out[i + 4 * j] = state[i][j];
     }
   }
-
-  delete[] state[0];
-  delete[] state;
 }
 
 void AES::DecryptBlock(unsigned char in[], unsigned char out[], unsigned  char *roundKeys)
