@@ -3,7 +3,6 @@
 
 namespace MyFork
 {
-    #define EXPERIMENTAL
     #include "AES/src/AES.h"
     #include "AES/src/AES.cpp"
 }
