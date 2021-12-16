@@ -3,6 +3,13 @@
 #include <chrono>
 #include <omp.h>
 
+#if defined(USE_CRYPTOPP)
+#include "cryptos/cryptopp_wrapper.hpp"
+#define CRYPTOLIB "crypto++"
+#else
+#define CRYPTOLIB "portable"
+#endif
+
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
 #include "cryptos/AES_SergeyBel.hpp"
@@ -19,6 +26,8 @@
 
 #define AES_ENCRYPT "--enc-AES"
 #define AES_DECRYPT "--dec-AES"
+
+#define AES_BLOCKSIZE 16
 
 #define AES128_BYTEKEY 16
 #define AES192_BYTEKEY 24
@@ -110,6 +119,8 @@ void emptyFileArgs(char cmd[10], int argcnt)
 
 int main(int argc, char* args[])
 {
+    std::cout << "\n";
+
     if(argc>=2)
     {
         if(MATCH(args[COMMAND],ENCRYPT_FLAG))
@@ -175,10 +186,16 @@ int main(int argc, char* args[])
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
-                    bconst::bytestream iv = keygen::random_bytestream(AES256_BYTEKEY);
+                    bconst::bytestream iv = keygen::random_bytestream(AES_BLOCKSIZE);
                     unsigned int output_len = 0;
 
-                    bconst::byte* encrypt_raw = crypt.EncryptCBC(filebytestream.data(),filebytestream.size(),iv.data(),output_len);
+                    bconst::byte* encrypt_raw;
+                    #ifndef USE_CRYPTOPP
+                    encrypt_raw = crypt.EncryptCBC(filebytestream.data(),filebytestream.size(),iv.data(),output_len);
+                    #else
+                    encrypt_raw = CryptoPP_AES_encrypt_CBC(filebytestream.data(),filebytestream.size(),loadKey.data(),loadKey.size(),iv.data(),output_len);
+                    #endif
+                    
                     bconst::bytestream encrypted(encrypt_raw,encrypt_raw+output_len);
                     encrypted.insert(encrypted.end(),iv.begin(),iv.end());
 
@@ -211,13 +228,20 @@ int main(int argc, char* args[])
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
-                    bconst::bytestream iv(filebytestream.end()-AES256_BYTEKEY,filebytestream.end());
+                    bconst::bytestream iv(filebytestream.end()-AES_BLOCKSIZE,filebytestream.end());
+
                     unsigned int output_len = filebytestream.size()-iv.size();
 
-                    bconst::byte* decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,iv.data());
+                    bconst::byte* decrypt_raw;
+                    #ifndef USE_CRYPTOPP
+                    decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,iv.data());
+                    #else
+                    decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
+                    #endif
                     
                     std::string output_filename(args[i]);
                     output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
+
                     cnt += byteio::file_write(output_filename,decrypt_raw,output_len);
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
                     delete [] decrypt_raw;
@@ -282,7 +306,7 @@ int main(int argc, char* args[])
         else if(!strcmp(args[COMMAND],VERSION_FLAG))
         {
             int executable_bit = sizeof(size_t)==SIZE_T_32BIT ? 32 : 64;
-            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << "\n";
+            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION <<" [" << CRYPTOLIB << "]\n";
         }
         else
         {

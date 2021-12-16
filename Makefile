@@ -7,7 +7,7 @@ INSTALLPATH=/usr/local/bin
 OS := $(shell uname)
 
 all:
-	@echo "compiling executable..."
+	@echo "compiling portable version..."
 
 ifeq ($(OS), Linux)
 	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE} -fopenmp -O3 -march=native
@@ -16,6 +16,16 @@ else
 	@g++ -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
+
+cryptopp:
+	@echo "compiliing executable with cryptopp"
+	@echo "WARNNING: The portable version of bethela is not compatible with the cryptopp version"
+	@g++ -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp -fopenmp -O3 -march=native
+
+cryptopp_debug:
+	@echo "compiliing executable with cryptopp"
+	@g++ -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address -fopenmp -O0 -Wall -Wextra
+
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
