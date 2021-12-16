@@ -9,20 +9,23 @@ namespace Cipher
     {
         switch (keyLen)
         {
-          case 128:
-              this->Nk = 4;
-              this->Nr = 10;
-              break;
-          case 192:
-              this->Nk = 6;
-              this->Nr = 12;
-              break;
-          case 256:
-              this->Nk = 8;
-              this->Nr = 14;
-              break;
-          default:
-              throw "Incorrect key length";
+            case 128:
+                std::cout << "\nAES128\n";
+                this->Nk = 4;
+                this->Nr = 10;
+                break;
+            case 192:
+                std::cout << "\nAES192\n";
+                this->Nk = 6;
+                this->Nr = 12;
+                break;
+            case 256:
+                std::cout << "\nAES256\n";
+                this->Nk = 8;
+                this->Nr = 14;
+                break;
+            default:
+                throw "Incorrect key length";
         }
 
         RoundedKeys = NULL;

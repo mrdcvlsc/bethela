@@ -105,13 +105,19 @@ namespace keygen
         return random_bytes;
     }
 
-    void AES_KEYCHECK(const bconst::bytestream& AES_KEY)
+    void AES_KEYCHECK(const bconst::bytestream& AES_KEY, size_t GIVEN_AES_KEY_SIZE)
     {
-        if(AES_KEY.size()!=32)
+        if(AES_KEY.size()==32 || AES_KEY.size()==24 || AES_KEY.size()==16)
         {
-            std::cerr << "\n\tERROR: bad key!\n\n";
-            exit(1);
-        };
+            if(AES_KEY.size()!=(GIVEN_AES_KEY_SIZE/8))
+            {
+                std::cerr << "\n\tERROR: bad key!\n\n";
+                exit(1);
+            }
+            return;
+        }
+        std::cerr << "\n\tERROR: bad key!\n\n";
+        exit(1);
     }
 }
 

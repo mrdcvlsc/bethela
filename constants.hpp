@@ -14,7 +14,7 @@ namespace bconst
     typedef unsigned char byte;
     typedef std::vector<unsigned char> bytestream;
 
-    const static std::string extension = ".bethela";
+    const static std::string extension = ".bthl";
     const static std::vector<byte> FILESIGNATURE({ 'B','E','T','H','E','L','A' });
 }
 

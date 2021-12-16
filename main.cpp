@@ -7,7 +7,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/AES_SergeyBel.hpp"
 
-#define BETHELA_VERSION "version 2.3.4"
+#define BETHELA_VERSION "version 2.4.4"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -17,8 +17,11 @@
 #define GENERATE_FLAG "--generate"
 #define REPLACE_FLAG "-replace"
 
-#define AES256_ENCRYPT "--aes256en"
-#define AES256_DECRYPT "--aes256de"
+#define AES_ENCRYPT "--enc-AES"
+#define AES_DECRYPT "--dec-AES"
+
+#define AES128_BYTEKEY 16
+#define AES192_BYTEKEY 24
 #define AES256_BYTEKEY 32
 
 #define COMMAND 1
@@ -35,6 +38,19 @@ std::cout << NAME << "cryption took : \n"; \
 std::cout << "\t" << duration.count() << " milliseconds\n"; \
 std::cout << "\t" << duration.count()/1000 << " seconds\n"; \
 std::cout << "\t" << NAME << "crypted File(s) : " << cnt << "\n"
+
+void NOTV_AES_KEY(size_t ARGS_AES_KEY_SIZE)
+{
+    switch(ARGS_AES_KEY_SIZE)
+    {
+        case AES128_BYTEKEY*8: return;
+        case AES192_BYTEKEY*8: return;
+        case AES256_BYTEKEY*8: return;
+    }
+    std::cerr << "\n\tERROR: invalid AES command given\n";
+    std::cout << "\t\t : "<< ARGS_AES_KEY_SIZE << "\n";
+    exit(1);
+}
 
 bool MATCH(const std::string& INPUT, const std::string& COMMAND_FLAG)
 {
@@ -60,6 +76,22 @@ void CHECKIF_REPLACE(const std::string& INPUT_COMMAND, const std::string& FILE_T
     }
 }
 
+#define CHECK_AES_ARG(AES_ARG_INPUT_COMMAND) \
+std::string AES_ARGUMENT(AES_ARG_INPUT_COMMAND); \
+if(!(AES_ARGUMENT.size()!=12 ^ AES_ARGUMENT.size()!=20)) \
+{ \
+    std::cerr << "\n\tERROR: AES key length invalid\n"; \
+    std::cerr <<   "\t       from arg " << AES_ARG_INPUT_COMMAND << "\n"; \
+    exit(1); \
+} \
+std::string AES_KEY_SIZE_STR; \
+AES_KEY_SIZE_STR.push_back(AES_ARG_INPUT_COMMAND[9]); \
+AES_KEY_SIZE_STR.push_back(AES_ARG_INPUT_COMMAND[10]); \
+AES_KEY_SIZE_STR.push_back(AES_ARG_INPUT_COMMAND[11]); \
+size_t AES_KEY_SIZE = std::atol(AES_KEY_SIZE_STR.data()); \
+NOTV_AES_KEY(AES_KEY_SIZE); \
+std::cerr << "Key length : " << AES_KEY_SIZE << "\n";
+
 void emptyFileArgs(char cmd[10], int argcnt)
 {
     if(argcnt==2)
@@ -82,6 +114,7 @@ int main(int argc, char* args[])
     {
         if(MATCH(args[COMMAND],ENCRYPT_FLAG))
         {
+            std::cout << "Default Encryption : Vigenere cipher \n";
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
@@ -101,6 +134,7 @@ int main(int argc, char* args[])
         }
         else if(MATCH(args[COMMAND],DECRYPT_FLAG))
         {
+            std::cout << "Default Decryption : Vigenere cipher \n";
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
@@ -120,18 +154,21 @@ int main(int argc, char* args[])
             }
             TIMING_END("De");
         }
-        else if(MATCH(args[COMMAND],AES256_ENCRYPT))
+        else if(MATCH(args[COMMAND],AES_ENCRYPT))
         {
+            CHECK_AES_ARG(args[COMMAND]);
+
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
-            keygen::AES_KEYCHECK(loadKey);
+            keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
 
-            MyFork::Cipher::AES crypt;
+            MyFork::Cipher::AES crypt(AES_KEY_SIZE);
             crypt.KeyExpansion(loadKey.data());
 
             TIMING_START;
             size_t cnt = 0;
 
+            std::cout << "Encryption : AES block cipher \n";
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
@@ -153,18 +190,21 @@ int main(int argc, char* args[])
             }
             TIMING_END("En");
         }
-        else if(MATCH(args[COMMAND],AES256_DECRYPT))
+        else if(MATCH(args[COMMAND],AES_DECRYPT))
         {
+            CHECK_AES_ARG(args[COMMAND]);
+
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
-            keygen::AES_KEYCHECK(loadKey);
+            keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
             
-            MyFork::Cipher::AES crypt;
+            MyFork::Cipher::AES crypt(AES_KEY_SIZE);
             crypt.KeyExpansion(loadKey.data());
 
             TIMING_START;
             size_t cnt = 0;
 
+            std::cout << "Decryption : AES block cipher \n";
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
@@ -237,7 +277,7 @@ int main(int argc, char* args[])
                 "\t\tbethela "<< DECRYPT_FLAG << REPLACE_FLAG << " keyfile file1 file2 ... fileN\n\n\n"
                 "\talgorithms:\n\n"
                 "\t\tVigenère  " << ENCRYPT_FLAG << " & " << DECRYPT_FLAG << "\n"
-                "\t\tAES256    " << AES256_ENCRYPT << " & " << AES256_DECRYPT << "\n\n\n";
+                "\t\tAES256    " << AES_ENCRYPT << "XXX & " << AES_DECRYPT << "XXX\n\n\n";
         }
         else if(!strcmp(args[COMMAND],VERSION_FLAG))
         {
