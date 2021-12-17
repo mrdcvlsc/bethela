@@ -56,7 +56,7 @@ unsigned char* CryptoPP_AES_encrypt_CBC(unsigned char in[], unsigned int inLen, 
     return cipher_array;
 }
 
-unsigned char * CryptoPP_AES_decrypt_CBC(unsigned char in[], unsigned int inLen, unsigned  char key[], int keyByteLength, unsigned char * iv)
+unsigned char * CryptoPP_AES_decrypt_CBC(unsigned char in[], unsigned int& inLen, unsigned  char key[], int keyByteLength, unsigned char * iv)
 {
     std::string cipher(reinterpret_cast<const char*>(in),inLen);
     std::string recovered;
@@ -73,7 +73,8 @@ unsigned char * CryptoPP_AES_decrypt_CBC(unsigned char in[], unsigned int inLen,
     // because of padding, recovered.size() can be smaller than or equal with inLen
     // hence we use inLen when allocating recovered_array to avoid heap-buffer overflow
     // when we write the bytes later in the file
-    unsigned char* recovered_array = new unsigned char[inLen];
+    inLen = recovered.size();
+    unsigned char* recovered_array = new unsigned char[recovered.size()];
     memcpy(recovered_array,recovered.data(),sizeof(const char)*recovered.size());
     return recovered_array;
 }

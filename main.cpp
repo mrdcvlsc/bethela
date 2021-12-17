@@ -137,6 +137,7 @@ int main(int argc, char* args[])
                 if(!filebytestream.empty())
                 {
                     vigenere::encrypt(filebytestream,loadKey);
+                    filebytestream.insert(filebytestream.end(),bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
                     cnt += byteio::file_write(args[i]+bconst::extension,filebytestream);
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
                 }
@@ -154,6 +155,16 @@ int main(int argc, char* args[])
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+                
+                if(filesig!=bconst::FILESIGNATURE)
+                {
+                    std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
+                    continue;
+                }
+                
+                filebytestream.erase(bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
+
                 if(!filebytestream.empty())
                 {
                     vigenere::decrypt(filebytestream,loadKey);
@@ -198,6 +209,7 @@ int main(int argc, char* args[])
                     
                     bconst::bytestream encrypted(encrypt_raw,encrypt_raw+output_len);
                     encrypted.insert(encrypted.end(),iv.begin(),iv.end());
+                    encrypted.insert(encrypted.end(),bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
 
                     cnt += byteio::file_write(args[i]+bconst::extension,encrypted);
 
@@ -226,11 +238,22 @@ int main(int argc, char* args[])
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+                
+                if(filesig!=bconst::FILESIGNATURE)
+                {
+                    std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
+                    continue;
+                }
+
                 if(!filebytestream.empty())
                 {
-                    bconst::bytestream iv(filebytestream.end()-AES_BLOCKSIZE,filebytestream.end());
+                    bconst::bytestream iv(
+                        filebytestream.end()-AES_BLOCKSIZE-bconst::FILESIGNATURE.size(),
+                        filebytestream.end()-bconst::FILESIGNATURE.size()
+                    );
 
-                    unsigned int output_len = filebytestream.size()-iv.size();
+                    unsigned int output_len = filebytestream.size()-iv.size()-bconst::FILESIGNATURE.size();
 
                     bconst::byte* decrypt_raw;
                     #ifndef USE_CRYPTOPP
@@ -306,7 +329,7 @@ int main(int argc, char* args[])
         else if(!strcmp(args[COMMAND],VERSION_FLAG))
         {
             int executable_bit = sizeof(size_t)==SIZE_T_32BIT ? 32 : 64;
-            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION <<" [" << CRYPTOLIB << "]\n";
+            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << " [" << CRYPTOLIB << "]\n";
         }
         else
         {
