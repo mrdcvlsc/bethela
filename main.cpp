@@ -241,41 +241,41 @@ int main(int argc, char* args[])
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                if(filebytestream.empty()) continue;
+                std::cout << "filebytestream size = " << filebytestream.size() << "\n";
+
                 bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
-                
+
                 if(filesig!=bconst::FILESIGNATURE)
                 {
                     std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
                     continue;
                 }
 
-                if(!filebytestream.empty())
-                {
-                    bconst::bytestream iv(
-                        filebytestream.end()-AES_BLOCKSIZE-bconst::FILESIGNATURE.size(),
-                        filebytestream.end()-bconst::FILESIGNATURE.size()
-                    );
+                bconst::bytestream iv(
+                    filebytestream.end()-AES_BLOCKSIZE-bconst::FILESIGNATURE.size(),
+                    filebytestream.end()-bconst::FILESIGNATURE.size()
+                );
 
-                    krypt.setIV(iv.data());
+                krypt.setIV(iv.data());
 
-                    unsigned int output_len = filebytestream.size()-iv.size()-bconst::FILESIGNATURE.size();
+                unsigned int output_len = filebytestream.size()-iv.size()-bconst::FILESIGNATURE.size();
 
-                    bconst::byte* decrypt_raw;
-                    #ifndef USE_CRYPTOPP
-                    std::pair<bconst::byte*,size_t> cipher = krypt.decrypt(filebytestream.data(),output_len);
-                    decrypt_raw = cipher.first;
-                    output_len = cipher.second;
-                    #else
-                    decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
-                    #endif
-                    
-                    std::string output_filename(args[i]);
-                    output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
+                bconst::byte* decrypt_raw;
+                #ifndef USE_CRYPTOPP
+                std::pair<bconst::byte*,size_t> cipher = krypt.decrypt(filebytestream.data(),output_len);
+                decrypt_raw = cipher.first;
+                output_len = cipher.second;
+                #else
+                decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
+                #endif
+                
+                std::string output_filename(args[i]);
+                output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
 
-                    cnt += byteio::file_write(output_filename,decrypt_raw,output_len);
-                    CHECKIF_REPLACE(args[COMMAND],args[i]);
-                    delete [] decrypt_raw;
-                }
+                cnt += byteio::file_write(output_filename,decrypt_raw,output_len);
+                CHECKIF_REPLACE(args[COMMAND],args[i]);
+                delete [] decrypt_raw;
             }
             TIMING_END("De");
         }
