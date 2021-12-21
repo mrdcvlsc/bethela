@@ -50,10 +50,21 @@ endif
 
 # TEST SCRIPTS
 
-test_vigenere:
-	./bethela --enc-AES256-replace tests/AES256.key tests/*.subject
-	./bethela --dec-AES256-replace tests/AES256.key tests/*.bthl
-	make checkfile
+test:
+	make genkeys
+	make randfile
+	make
+	make aestest
+	make cryptopp
+	make aestest
+	rm tests/*.key
+	rm tests/*.subject
+	rm tests/*.validator
+
+aestest:
+	@./bethela --enc-AES256-replace tests/AES256.key tests/*.subject
+	@./bethela --dec-AES256-replace tests/AES256.key tests/*.bthl
+	@make checkfile
 
 randfile:
 	@echo "compiling random file generator"
@@ -69,10 +80,10 @@ checkfile:
 
 genkeys:
 	@echo "generate keys"
-	./bethela --generate tests/testkeyVignere1000.key 1000
-	./bethela --generate tests/AES128.key 16
-	./bethela --generate tests/AES192.key 24
-	./bethela --generate tests/AES256.key 32
+	@./bethela --generate tests/testkeyVignere1000.key 1000
+	@./bethela --generate tests/AES128.key 16
+	@./bethela --generate tests/AES192.key 24
+	@./bethela --generate tests/AES256.key 32
 
 encryptfile:
 	@echo "encrypting test files..."
