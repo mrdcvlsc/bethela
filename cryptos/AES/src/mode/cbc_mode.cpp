@@ -65,7 +65,7 @@ namespace Krypt::Mode
     }
 
     template<typename CIPHER_TYPE, typename PADDING_TYPE>
-    void CFB<CIPHER_TYPE,PADDING_TYPE>::setIV(Bytes* inputIV)
+    void CBC<CIPHER_TYPE,PADDING_TYPE>::setIV(Bytes* inputIV)
     {
         this->Encryption->IV = inputIV;
     }
