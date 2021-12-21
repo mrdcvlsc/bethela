@@ -9,7 +9,7 @@ namespace Krypt::Mode
     CBC<CIPHER_TYPE,PADDING_TYPE>::CBC(const Bytes* key, size_t keyLen)
         : MODE<CIPHER_TYPE,PADDING_TYPE>()
     {
-        this->Encryption = new CIPHER_TYPE(key,keyLen,NULL);
+        this->Encryption = new CIPHER_TYPE(key,keyLen);
         this->PaddingScheme = new PADDING_TYPE();
     }
 

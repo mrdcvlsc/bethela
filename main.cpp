@@ -262,7 +262,7 @@ int main(int argc, char* args[])
 
                     bconst::byte* decrypt_raw;
                     #ifndef USE_CRYPTOPP
-                    std::pair<bconst::byte*,size_t> cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
+                    std::pair<bconst::byte*,size_t> cipher = krypt.decrypt(filebytestream.data(),filebytestream.size());
                     decrypt_raw = cipher.first;
                     output_len = cipher.second;
                     #else
