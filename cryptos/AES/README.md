@@ -1,72 +1,72 @@
-# AES
+# Krypt
 
 Forked From : https://github.com/SergeyBel/AES
 
-C++ AES(Advanced Encryption Standard) implementation  
- 
+### About this fork
+
+This fork was optimized and used by my file [encryption/decryption program](https://github.com/mrdcvlsc/bethela).
+
+**This is a portable software implementation, no Inline assembly, no SIMD intrinsics, so performance won't be as fast as optimized libraries like OpenSSL or Crypto++, it only relies on compiler optimizations for better performance.**
+
 ![Tests](https://github.com/mrdcvlsc/AES/actions/workflows/google-test.yml/badge.svg)
 
+-----------
 
-**This class is very simple to use:**
+**Compilation Note:** This is a header only library, you only need to include the ```"Krypt.hpp"```, no need to compile the library first, and there's no need to add/link the ```.cpp``` files of the library to your compilation flag, see the example below.
+
+***To get the peak performance of this portable library compile it with the flags ```-D PADDING_CHECK_DISABLE -O3 -march=native```***
+
+**sample program:**
 ```c++
-...
+/*    sample.cpp    */
+#include <iostream>
+#include "src/Krypt.hpp"
 
+using namespace Krypt;
 
-unsigned char plain[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }; //plaintext example
-unsigned char key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }; //key example
-unsigned int plainLen = 16 * sizeof(unsigned char);  //bytes in plaintext
-unsigned int outLen = 0;  // out param - bytes in сiphertext
+int main()
+{
+    unsigned char plain[] = {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+        0x88, 0x99, 0xaa, 0xbb
+    };
 
-AES aes(128);  //128 - key length, can be 128, 192 or 256
-c = aes.EncryptECB(plain, plainLen, key, outLen);
-//now variable c contains outLen bytes - ciphertext
-...
+    // if you want to use AES192 or AES256, just increase the size of the key to
+    // 24 or 32... the AES class will automatically detect it, it will aslo throw
+    // an error if the key size is not 16,24 or 32
+    unsigned char aes128key[16] = {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+    };
+
+    Mode::ECB<BlockCipher::AES,Padding::ANSI_X9_23> krypt(aes128key,sizeof(aes128key));
+
+    // `Krypt::Bytes` is just a typedef for `unsigned char`
+    ByteArray cipher  = krypt.encrypt(plain,sizeof(plain));
+    ByteArray recover = krypt.decrypt(cipher.first,cipher.second);
+}
 ```
-Or for vectors:
-```c++
-...
 
+**compile with** ```g++ sample.cpp -D PADDING_CHECK_DISABLE -o sample.exe -O3 -march=native```
 
-vector<unsigned char> plain = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }; //plaintext example
-vector<unsigned char> key = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }; //key example
+-------------
 
-AES aes(128);
-c = aes.EncryptECB(plain, key);
-//now vector c contains ciphertext
-...
-```
-ECB, CBC, CFB modes are supported.
+<br>
 
+**```Krypt``` namespace contains the following :**
 
-You can read more about AES here:
+| sub-namespace | sub-namespace classes |
+| --- | --- |
+| ```BlockCipher``` | ```AES``` |
+| ```Padding``` | ```ZeroNulls```, ```ANSI_X9_23```, ```ISO_IEC_7816_4```, ```PKCS_5_7``` |
+| ```Mode``` | ```ECB```, ```CBC```, ```CFB``` |
 
-https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
+<br>
 
-http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
-
-<!--
-**Development:**
-1. `git clone https://github.com/SergeyBel/AES.git`
-1. `docker-compose build`
-1. `docker-compose up -d`
-1. use make commands
-
-There are four executables in `bin` folder:  
-* `test` - run tests  
-* `debug` - version for debugging (main code will be taken from dev/main.cpp)  
-* `profile` - version for profiling with gprof (main code will be taken from dev/main.cpp)  
-* `release` - version with optimization (main code will be taken from dev/main.cpp)  
-
-
-Build commands:  
-* `make build_all` - build all targets
-* `make build_test` - build `test` target
-* `make build_debug` - build `debug` target
-* `make build_profile` - build `profile` target
-* `make build_release` - build `release` target
-* `make test` - run tests
-* `make debug` - run debug version
-* `make profile` - run profile version
-* `make release` - run `release` version
-* `make clean` - clean `bin` directory
--->
+**The ```ByteArray``` class** is used to hold the output of ```encrypt()/decrypt()``` methods of the ```Mode``` classes, and the output of ```AddPadding()/RemovePadding()``` methods of the ```Padding``` classes... ```ByteArray``` methods are listed below :
+- ```length()``` - returns the size of the byte array
+- ```array()``` - returns the byte array pointer[```Krypt::Bytes* or unsigned char*```]
+- ```detach()``` - returns the byte array pointer[```Krypt::Bytes* or unsigned char*```], that pointer is then dettached to the instance of the ByteArray
+- ```operator<<``` - an overload for the left-shift operator
+- ```operator>>``` - an overload for the right-shift operator
+- ```operator[]``` - an overload for the bracket operator, use for indexing the array

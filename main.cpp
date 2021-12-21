@@ -12,9 +12,9 @@
 
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
-#include "cryptos/AES_SergeyBel.hpp"
+#include "cryptos/AES/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 2.4.4"
+#define BETHELA_VERSION "version 3.4.4"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -117,6 +117,8 @@ void emptyFileArgs(char cmd[10], int argcnt)
     }
 }
 
+using namespace Krypt;
+
 int main(int argc, char* args[])
 {
     std::cout << "\n";
@@ -184,8 +186,7 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
 
-            MyFork::Cipher::AES crypt(AES_KEY_SIZE);
-            crypt.KeyExpansion(loadKey.data());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> krypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -198,11 +199,14 @@ int main(int argc, char* args[])
                 if(!filebytestream.empty())
                 {
                     bconst::bytestream iv = keygen::random_bytestream(AES_BLOCKSIZE);
+                    krypt.setIV(iv.data());
                     unsigned int output_len = 0;
 
                     bconst::byte* encrypt_raw;
                     #ifndef USE_CRYPTOPP
-                    encrypt_raw = crypt.EncryptCBC(filebytestream.data(),filebytestream.size(),iv.data(),output_len);
+                    std::pair<bconst::byte*,size_t> cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
+                    encrypt_raw = cipher.first;
+                    output_len = cipher.second;
                     #else
                     encrypt_raw = CryptoPP_AES_encrypt_CBC(filebytestream.data(),filebytestream.size(),loadKey.data(),loadKey.size(),iv.data(),output_len);
                     #endif
@@ -227,8 +231,7 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
             
-            MyFork::Cipher::AES crypt(AES_KEY_SIZE);
-            crypt.KeyExpansion(loadKey.data());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> krypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -253,11 +256,15 @@ int main(int argc, char* args[])
                         filebytestream.end()-bconst::FILESIGNATURE.size()
                     );
 
+                    krypt.setIV(iv.data());
+
                     unsigned int output_len = filebytestream.size()-iv.size()-bconst::FILESIGNATURE.size();
 
                     bconst::byte* decrypt_raw;
                     #ifndef USE_CRYPTOPP
-                    decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,iv.data());
+                    std::pair<bconst::byte*,size_t> cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
+                    decrypt_raw = cipher.first;
+                    output_len = cipher.second;
                     #else
                     decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
                     #endif

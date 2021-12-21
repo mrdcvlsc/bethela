@@ -1,9 +1,9 @@
 #ifndef SHIFT_ROWS_CPP
 #define SHIFT_ROWS_CPP
 
-#include "AES.h"
+#include "../../blockcipher.hpp"
 
-namespace Cipher
+namespace Krypt::BlockCipher
 {
     void AES::ShiftRows(unsigned char state[4][4])
     {
@@ -13,10 +13,10 @@ namespace Cipher
         state[1][3] = buffer;
 
         // row 3
-        unsigned char temp[2];
-        memcpy(temp,state[2],sizeof(unsigned char)*2);
+        unsigned char thrid[2];
+        memcpy(thrid,state[2],sizeof(unsigned char)*2);
         memcpy(state[2],state[2]+2,sizeof(unsigned char)*2);
-        memcpy(state[2]+2,temp,sizeof(unsigned char)*2);
+        memcpy(state[2]+2,thrid,sizeof(unsigned char)*2);
 
         // row 4
         buffer = state[3][3];
@@ -32,10 +32,10 @@ namespace Cipher
         state[1][0] = buffer;
 
         // row 3
-        unsigned char temp[2];
-        memcpy(temp,state[2],sizeof(unsigned char)*2);
+        unsigned char thrid[2];
+        memcpy(thrid,state[2],sizeof(unsigned char)*2);
         memcpy(state[2],state[2]+2,sizeof(unsigned char)*2);
-        memcpy(state[2]+2,temp,sizeof(unsigned char)*2);
+        memcpy(state[2]+2,thrid,sizeof(unsigned char)*2);
 
         // row 4
         buffer = state[3][0];
