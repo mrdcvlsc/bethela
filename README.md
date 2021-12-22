@@ -1,11 +1,13 @@
 # bethela
 
+![ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/build-test.yml/badge.svg)
+
 A simple terminal command line tool for symmetric encrpytion & decryption of any files
 
 ### install in linux
 
 <ul>
-  
+
 ```
 wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v3.4.4.tar.gz
 tar -xf v3.4.4..tar.gz

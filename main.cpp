@@ -157,20 +157,22 @@ int main(int argc, char* args[])
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                if(filebytestream.empty()) continue;
+
                 bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
-                
                 if(filesig!=bconst::FILESIGNATURE)
                 {
                     std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
                     continue;
                 }
                 
-                filebytestream.erase(bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
-
+                filebytestream.erase(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+               
                 if(!filebytestream.empty())
                 {
                     vigenere::decrypt(filebytestream,loadKey);
                     std::string output_filename(args[i]);
+
                     output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
                     cnt += byteio::file_write(output_filename,filebytestream);
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
@@ -242,7 +244,6 @@ int main(int argc, char* args[])
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(filebytestream.empty()) continue;
-                std::cout << "filebytestream size = " << filebytestream.size() << "\n";
 
                 bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
 

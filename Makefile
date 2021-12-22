@@ -30,7 +30,7 @@ cryptopp_debug:
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
-	$(CC) main.cpp -o ${EXECUTABLE} -Wall -Wextra -Og -fopenmp -g -fsanitize=address
+	$(CC) main.cpp -o ${EXECUTABLE} -Wall -Wextra -O0 -fopenmp -g -fsanitize=address
 	@echo "compiling done"
 
 install:
@@ -51,15 +51,49 @@ endif
 # TEST SCRIPTS
 
 test:
-	make genkeys
-	make randfile
-	make
-	make aestest
-	make cryptopp
-	make aestest
-	rm tests/*.key
-	rm tests/*.subject
-	rm tests/*.validator
+	@echo "-----------------------------------------------------------"
+	@echo "====================   GENERATE KEYS   ===================="
+	@echo "-----------------------------------------------------------"
+	@make genkeys
+	@echo "-----------------------------------------------------------"
+	@echo "=================   GENERATE TEST FILES   ================="
+	@echo "-----------------------------------------------------------"
+	@make randfile
+	@echo "-----------------------------------------------------------"
+	@echo "===============   COMPLING PORTABLE AES  =================="
+	@echo "-----------------------------------------------------------"
+	@make
+	@echo "-----------------------------------------------------------"
+	@echo "===============   TESTING PORTABLE AES  ==================="
+	@echo "-----------------------------------------------------------"
+	@./bethela --version
+	@make aestest
+	@echo "-----------------------------------------------------------"
+	@echo "===============   COMPILING CRYPTOPP AES  ================="
+	@echo "-----------------------------------------------------------"
+	@make cryptopp
+	@echo "-----------------------------------------------------------"
+	@echo "===============   TESTING CRYPTOPP AES  ==================="
+	@echo "-----------------------------------------------------------"
+	@./bethela --version
+	@make aestest
+	@echo "-----------------------------------------------------------"
+	@echo "=================   TESTING VIGENERE   ===================="
+	@echo "-----------------------------------------------------------"
+	@make vigtest
+	@echo "-----------------------------------------------------------"
+	@echo "=================   CLEANING TEST FILES   ================="
+	@echo "-----------------------------------------------------------"
+	@make clean
+	@echo "-----------------------------------------------------------"
+	@echo "=================   ALL TEST SUCCESS!!!   ================="
+	@echo "-----------------------------------------------------------"
+
+install_cryptoppp:
+	@echo "-----------------------------------------------------------"
+	@echo "=================   INSTALL CRYPTOPP   ===================="
+	@echo "-----------------------------------------------------------"
+	@sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
 
 aestest:
 	@./bethela --enc-AES256-replace tests/AES256.key tests/*.subject
@@ -68,13 +102,13 @@ aestest:
 
 randfile:
 	@echo "compiling random file generator"
-	@$(CC) tests/RandFile.cpp -o tests/RandFile -O2
+	@$(CC) tests/RandFile.cpp -o tests/RandFile -fsanitize=address
 	@echo "generating random files..."
 	@cd tests && ./RandFile
 
 checkfile:
 	@echo "compiling equality file checker"
-	@$(CC) tests/FileCompare.cpp -o tests/FileCompare -O2
+	@$(CC) tests/FileCompare.cpp -o tests/FileCompare -fsanitize=address
 	@echo "checking random files equality..."
 	@cd tests && ./FileCompare
 
@@ -85,6 +119,13 @@ genkeys:
 	@./bethela --generate tests/AES192.key 24
 	@./bethela --generate tests/AES256.key 32
 
-encryptfile:
+vigtest:
 	@echo "encrypting test files..."
-	./bethela --generate tests/testkeyVignere1000.key 1000
+	@./bethela --encrypt-replace tests/testkeyVignere1000.key tests/*.subject
+	@./bethela --decrypt-replace tests/testkeyVignere1000.key tests/*.bthl
+	@make checkfile
+
+clean:
+	@rm tests/*.key
+	@rm tests/*.subject
+	@rm tests/*.validator
