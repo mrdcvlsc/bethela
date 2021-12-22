@@ -34,14 +34,19 @@ clean:
 
 ########################## CLASSIC MAKEFILE ##########################
 
-gh_workflow:
+gh_bench:
+	mkdir bin
+	g++ tests/benchmark.cpp -lbenchmark -lpthread -o bin/benchmark -O3 -march=native
+	bin/benchmark
+
+gh_test:
 	mkdir bin
 	make compile_test
-	make run_test
 
 compile_all: clean compile_test compile_debug compile_profile compile_release
 
 compile_test:
+	g++ $(FLAGS) -g ./tests/moves.cpp -D CLASSIC_MAKE -lgtest -lpthread -o bin/moves
 	g++ $(FLAGS) -g ./tests/tests.cpp -D CLASSIC_MAKE -lgtest -lpthread -fsanitize=address -o bin/test
 
 compile_debug:
@@ -54,6 +59,7 @@ compile_release:
 	g++ $(FLAGS) -O2 ./dev/main.cpp -o bin/release
 
 run_test:
+	bin/moves
 	bin/test
 
 run_debug:

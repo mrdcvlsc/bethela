@@ -1,15 +1,17 @@
 # bethela
 
+![ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/build-test.yml/badge.svg)
+
 A simple terminal command line tool for symmetric encrpytion & decryption of any files
 
 ### install in linux
 
 <ul>
-  
+
 ```
-wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v2.3.4.tar.gz
-tar -xf v2.3.4.tar.gz
-cd bethela-2.3.4
+wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v3.4.4.tar.gz
+tar -xf v3.4.4..tar.gz
+cd bethela-3.4.4
 make
 make install
 ```
@@ -20,6 +22,8 @@ cd bethela
 make
 make install
 ```
+
+***If you have crypto++ in your system you can use it instead of the portable AES, to do this in the installation replace ```make``` with ```make cryptopp```***
   
 </ul>
 
@@ -63,7 +67,8 @@ bethela --decrypt-replace keyfile file1 file2 ... fileN
 
 <br>
 
-### for more information
+for more information about using AES and other info about the program use the command below to show the help menu
+
 ```
 bethela --help
 ```

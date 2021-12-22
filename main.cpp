@@ -3,11 +3,18 @@
 #include <chrono>
 #include <omp.h>
 
+#if defined(USE_CRYPTOPP)
+#include "cryptos/cryptopp_wrapper.hpp"
+#define CRYPTOLIB "crypto++"
+#else
+#define CRYPTOLIB "portable"
+#endif
+
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
-#include "cryptos/AES_SergeyBel.hpp"
+#include "cryptos/AES/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 2.4.4"
+#define BETHELA_VERSION "version 3.4.4"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -19,6 +26,8 @@
 
 #define AES_ENCRYPT "--enc-AES"
 #define AES_DECRYPT "--dec-AES"
+
+#define AES_BLOCKSIZE 16
 
 #define AES128_BYTEKEY 16
 #define AES192_BYTEKEY 24
@@ -108,8 +117,12 @@ void emptyFileArgs(char cmd[10], int argcnt)
     }
 }
 
+using namespace Krypt;
+
 int main(int argc, char* args[])
 {
+    std::cout << "\n";
+
     if(argc>=2)
     {
         if(MATCH(args[COMMAND],ENCRYPT_FLAG))
@@ -126,6 +139,7 @@ int main(int argc, char* args[])
                 if(!filebytestream.empty())
                 {
                     vigenere::encrypt(filebytestream,loadKey);
+                    filebytestream.insert(filebytestream.end(),bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
                     cnt += byteio::file_write(args[i]+bconst::extension,filebytestream);
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
                 }
@@ -143,10 +157,22 @@ int main(int argc, char* args[])
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
+                if(filebytestream.empty()) continue;
+
+                bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+                if(filesig!=bconst::FILESIGNATURE)
+                {
+                    std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
+                    continue;
+                }
+                
+                filebytestream.erase(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+               
                 if(!filebytestream.empty())
                 {
                     vigenere::decrypt(filebytestream,loadKey);
                     std::string output_filename(args[i]);
+
                     output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
                     cnt += byteio::file_write(output_filename,filebytestream);
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
@@ -162,8 +188,7 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
 
-            MyFork::Cipher::AES crypt(AES_KEY_SIZE);
-            crypt.KeyExpansion(loadKey.data());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> krypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -175,12 +200,22 @@ int main(int argc, char* args[])
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
                 if(!filebytestream.empty())
                 {
-                    bconst::bytestream iv = keygen::random_bytestream(AES256_BYTEKEY);
+                    bconst::bytestream iv = keygen::random_bytestream(AES_BLOCKSIZE);
+                    krypt.setIV(iv.data());
                     unsigned int output_len = 0;
 
-                    bconst::byte* encrypt_raw = crypt.EncryptCBC(filebytestream.data(),filebytestream.size(),iv.data(),output_len);
+                    bconst::byte* encrypt_raw;
+                    #ifndef USE_CRYPTOPP
+                    std::pair<bconst::byte*,size_t> cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
+                    encrypt_raw = cipher.first;
+                    output_len = cipher.second;
+                    #else
+                    encrypt_raw = CryptoPP_AES_encrypt_CBC(filebytestream.data(),filebytestream.size(),loadKey.data(),loadKey.size(),iv.data(),output_len);
+                    #endif
+                    
                     bconst::bytestream encrypted(encrypt_raw,encrypt_raw+output_len);
                     encrypted.insert(encrypted.end(),iv.begin(),iv.end());
+                    encrypted.insert(encrypted.end(),bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
 
                     cnt += byteio::file_write(args[i]+bconst::extension,encrypted);
 
@@ -198,8 +233,7 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
             
-            MyFork::Cipher::AES crypt(AES_KEY_SIZE);
-            crypt.KeyExpansion(loadKey.data());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> krypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -209,19 +243,40 @@ int main(int argc, char* args[])
             for(int i=STARTING_FILE; i<argc; ++i)
             {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
-                if(!filebytestream.empty())
-                {
-                    bconst::bytestream iv(filebytestream.end()-AES256_BYTEKEY,filebytestream.end());
-                    unsigned int output_len = filebytestream.size()-iv.size();
+                if(filebytestream.empty()) continue;
 
-                    bconst::byte* decrypt_raw = crypt.DecryptCBC(filebytestream.data(),output_len,iv.data());
-                    
-                    std::string output_filename(args[i]);
-                    output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
-                    cnt += byteio::file_write(output_filename,decrypt_raw,output_len);
-                    CHECKIF_REPLACE(args[COMMAND],args[i]);
-                    delete [] decrypt_raw;
+                bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+
+                if(filesig!=bconst::FILESIGNATURE)
+                {
+                    std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
+                    continue;
                 }
+
+                bconst::bytestream iv(
+                    filebytestream.end()-AES_BLOCKSIZE-bconst::FILESIGNATURE.size(),
+                    filebytestream.end()-bconst::FILESIGNATURE.size()
+                );
+
+                krypt.setIV(iv.data());
+
+                unsigned int output_len = filebytestream.size()-iv.size()-bconst::FILESIGNATURE.size();
+
+                bconst::byte* decrypt_raw;
+                #ifndef USE_CRYPTOPP
+                std::pair<bconst::byte*,size_t> cipher = krypt.decrypt(filebytestream.data(),output_len);
+                decrypt_raw = cipher.first;
+                output_len = cipher.second;
+                #else
+                decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
+                #endif
+                
+                std::string output_filename(args[i]);
+                output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
+
+                cnt += byteio::file_write(output_filename,decrypt_raw,output_len);
+                CHECKIF_REPLACE(args[COMMAND],args[i]);
+                delete [] decrypt_raw;
             }
             TIMING_END("De");
         }
@@ -282,7 +337,7 @@ int main(int argc, char* args[])
         else if(!strcmp(args[COMMAND],VERSION_FLAG))
         {
             int executable_bit = sizeof(size_t)==SIZE_T_32BIT ? 32 : 64;
-            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << "\n";
+            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << " [" << CRYPTOLIB << "]\n";
         }
         else
         {

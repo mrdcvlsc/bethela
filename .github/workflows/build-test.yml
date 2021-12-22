@@ -1,0 +1,22 @@
+name: build-test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: install crypto++
+      run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
+      
+    - uses: actions/checkout@v2
+    
+    - name: build and run tests
+      run: make test
