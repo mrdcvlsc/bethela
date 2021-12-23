@@ -24,6 +24,8 @@ make install
 ```
 
 ***If you have crypto++ in your system you can use it instead of the portable AES, to do this in the installation replace ```make``` with ```make cryptopp```***
+
+***If your system supports AES-NI(most modern coputer does), use ```make aesni```***
   
 </ul>
 

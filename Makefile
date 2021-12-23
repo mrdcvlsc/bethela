@@ -12,16 +12,25 @@ all:
 	@echo "compiling portable version..."
 
 ifeq ($(OS), Linux)
-	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE} -fopenmp -O3 -march=native
+	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -fopenmp -O3 -march=native -o ${EXECUTABLE}
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
 	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
+aesni:
+	@echo "compiling with AES-NI support"
+ifeq ($(OS), Linux)
+	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O3 -march=native -o ${EXECUTABLE}
+else
+	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
+	@$(CC) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+endif
+	@echo "compilation done."
+
 cryptopp:
 	@echo "compiliing executable with cryptopp"
-	@echo "WARNNING: The portable version of bethela is not compatible with the cryptopp version"
 	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp -fopenmp -O3 -march=native
 
 cryptopp_debug:
@@ -77,6 +86,15 @@ test:
 	@echo "-----------------------------------------------------------"
 	@./bethela --version
 	@make aestest
+	@echo "-----------------------------------------------------------"
+	@echo "===============   COMPILING AES-NI AES   ================="
+	@echo "-----------------------------------------------------------"
+	@make aesni
+	@echo "-----------------------------------------------------------"
+	@echo "===============   TESTING AES-NI AES   ===================="
+	@echo "-----------------------------------------------------------"
+	@./bethela --version
+	@make aestest	
 	@echo "-----------------------------------------------------------"
 	@echo "=================   TESTING VIGENERE   ===================="
 	@echo "-----------------------------------------------------------"

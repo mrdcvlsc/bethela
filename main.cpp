@@ -6,13 +6,15 @@
 #if defined(USE_CRYPTOPP)
 #include "cryptos/cryptopp_wrapper.hpp"
 #define CRYPTOLIB "crypto++"
+#elif defined(USE_AESNI)
+#define CRYPTOLIB "AES-NI"
 #else
 #define CRYPTOLIB "portable"
 #endif
 
 #include "byteio.hpp"
 #include "cryptos/vigenere.hpp"
-#include "cryptos/AES/src/Krypt.hpp"
+#include "cryptos/Krypt/src/Krypt.hpp"
 
 #define BETHELA_VERSION "version 3.4.4"
 #define SIZE_T_32BIT 4
