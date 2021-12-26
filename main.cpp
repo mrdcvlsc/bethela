@@ -260,9 +260,6 @@ int main(int argc, char* args[])
                 char* filesig = new char[bconst::FILESIGNATURE.size()];
                 std::string infname(args[i]), outfname(args[i]);
                 outfname = outfname.substr(0,outfname.size()-bconst::extension.size());
-                std::ofstream output_file(outfname, std::ios::binary | std::ios::trunc);
-                output_file.close();
-                output_file.open(outfname, std::ios::binary | std::ios::app);
 
                 std::ifstream curr_file(infname,std::ios::binary);
 
@@ -274,6 +271,10 @@ int main(int argc, char* args[])
                 }
                 else
                 {
+                    std::ofstream output_file(outfname, std::ios::binary | std::ios::trunc);
+                    output_file.close();
+                    output_file.open(outfname, std::ios::binary | std::ios::app);
+
                     char* iv = new char[AES_BLOCKSIZE];
                     curr_file.read(iv,AES_BLOCKSIZE);
 
@@ -286,7 +287,7 @@ int main(int argc, char* args[])
                         {
                             Krypt::ByteArray recover = blocksNoPadding.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,reinterpret_cast<unsigned char*>(iv));
                             output_file.write(reinterpret_cast<char*>(recover.array),recover.length);
-                            memcpy(iv,reinterpret_cast<char*>(recover.array+(read_buffer_size-AES_BLOCKSIZE)),recover.length);
+                            memcpy(iv,reinterpret_cast<char*>(recover.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE)),AES_BLOCKSIZE);
                         }
                         else if(curr_file.eof())
                         {
@@ -299,11 +300,11 @@ int main(int argc, char* args[])
                         }
                     }
                     delete [] iv;
+                    CHECKIF_REPLACE(args[COMMAND],args[i]);
                 }
 
                 delete [] tbuffer;
                 delete [] filesig;
-                CHECKIF_REPLACE(args[COMMAND],args[i]);
                 ///////////////////
             }
             TIMING_END("De");

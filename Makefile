@@ -32,10 +32,10 @@ endif
 aesni_debug:
 	@echo "compiling with AES-NI-debug support"
 ifeq ($(OS), Linux)
-	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O3 -march=native -o ${EXECUTABLE} -fsanitize=address
+	@$(CC) -g -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O0 -march=native -o ${EXECUTABLE} -fsanitize=address
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CC) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3 -fsanitize=address
+	@$(CC) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
 endif
 	@echo "compilation done."
 
@@ -49,7 +49,7 @@ endif
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
-	$(CC) main.cpp -o ${EXECUTABLE} -Wall -Wextra -O3 -fopenmp -fsanitize=address
+	$(CC) -g main.cpp -o ${EXECUTABLE} -Wall -Wextra -O0 -fopenmp -fsanitize=address
 	@echo "compiling done"
 
 install:
