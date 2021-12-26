@@ -13,8 +13,8 @@ namespace Krypt::BlockCipher
     {
         public:
             //  BLOCK_SIZE IN BYTES
-            size_t BLOCK_SIZE;
-            Bytes *IV;
+            size_t BLOCK_SIZE = 0;
+            Bytes *IV = NULL;
 
             BASE_BLOCKCIPHER(size_t blockSize) : BLOCK_SIZE(blockSize) {}
 
@@ -34,7 +34,7 @@ namespace Krypt::BlockCipher
             const static size_t Nb = 4;
             size_t Nk;
             size_t Nr;
-            Bytes *RoundedKeys;
+            Bytes *RoundedKeys = NULL;
 
             void KeyExpansion(const Bytes* key);
 

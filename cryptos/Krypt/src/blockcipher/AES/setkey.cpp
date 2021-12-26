@@ -44,6 +44,7 @@ namespace Krypt::BlockCipher
     AES::AES(const Bytes* ByteArray, size_t keyLen, const Bytes* IV) : BASE_BLOCKCIPHER(16)
     {
         setKey(ByteArray,keyLen);
+        if(this->IV!=NULL) delete this->IV;
         this->IV = new Bytes[this->BLOCK_SIZE];
         memcpy(this->IV,IV,this->BLOCK_SIZE);
     }

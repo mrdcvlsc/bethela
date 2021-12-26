@@ -16,7 +16,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/Krypt/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 3.4.4"
+#define BETHELA_VERSION "version 3.5.4"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -38,6 +38,8 @@
 #define COMMAND 1
 #define KEY 2
 #define STARTING_FILE 3
+
+#define BUFFER_BYTESIZE 134217728
 
 #define TIMING_START std::cout << "program running, please wait...\n"; \
 auto start = std::chrono::high_resolution_clock::now()
@@ -190,7 +192,8 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
 
-            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> krypt(loadKey.data(),loadKey.size());
+            Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -199,31 +202,39 @@ int main(int argc, char* args[])
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
-                bconst::bytestream filebytestream = byteio::file_read(args[i]);
-                if(!filebytestream.empty())
+                char* tbuffer = new char[BUFFER_BYTESIZE];
+                std::string infname(args[i]), outfname(args[i]+bconst::extension);
+                std::ifstream curr_file(infname,std::ios::binary);
+                
+                bconst::bytestream iv = keygen::random_bytestream(AES_BLOCKSIZE);
+                blocksNoPadding.setIV(iv.data());
+                lastBlockKrypt.setIV(iv.data());
+
+                std::ofstream output_file(outfname,std::ios::binary | std::ios::trunc);
+                output_file.write(reinterpret_cast<const char*>(bconst::FILESIGNATURE.data()),bconst::FILESIGNATURE.size());
+                output_file.close();
+                output_file.open(outfname,std::ios::binary | std::ios::app);
+                output_file.write(reinterpret_cast<const char*>(iv.data()),iv.size());
+
+                while(!curr_file.eof())
                 {
-                    bconst::bytestream iv = keygen::random_bytestream(AES_BLOCKSIZE);
-                    krypt.setIV(iv.data());
-                    unsigned int output_len = 0;
+                    curr_file.read(tbuffer,BUFFER_BYTESIZE);
+                    size_t read_buffer_size = curr_file.gcount();
 
-                    bconst::byte* encrypt_raw;
-                    #ifndef USE_CRYPTOPP
-                    Krypt::ByteArray cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
-                    output_len = cipher.length;
-                    encrypt_raw = cipher.detach();
-                    #else
-                    encrypt_raw = CryptoPP_AES_encrypt_CBC(filebytestream.data(),filebytestream.size(),loadKey.data(),loadKey.size(),iv.data(),output_len);
-                    #endif
-                    
-                    bconst::bytestream encrypted(encrypt_raw,encrypt_raw+output_len);
-                    encrypted.insert(encrypted.end(),iv.begin(),iv.end());
-                    encrypted.insert(encrypted.end(),bconst::FILESIGNATURE.begin(),bconst::FILESIGNATURE.end());
-
-                    cnt += byteio::file_write(args[i]+bconst::extension,encrypted);
-
-                    CHECKIF_REPLACE(args[COMMAND],args[i]);
-                    delete [] encrypt_raw;
+                    if(!curr_file.eof())
+                    {
+                        Krypt::ByteArray cipher = blocksNoPadding.encrypt(reinterpret_cast<unsigned char*>(tbuffer),BUFFER_BYTESIZE);
+                        output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
+                        blocksNoPadding.setIV(cipher.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE));
+                        lastBlockKrypt.setIV(cipher.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE));
+                    }
+                    else
+                    {
+                        Krypt::ByteArray cipher = lastBlockKrypt.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size);
+                        output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
+                    }
                 }
+                delete [] tbuffer;
             }
             TIMING_END("En");
         }
@@ -235,7 +246,8 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
             
-            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> krypt(loadKey.data(),loadKey.size());
+            Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -244,41 +256,55 @@ int main(int argc, char* args[])
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
-                bconst::bytestream filebytestream = byteio::file_read(args[i]);
-                if(filebytestream.empty()) continue;
+                char* tbuffer = new char[BUFFER_BYTESIZE];
+                char* filesig = new char[bconst::FILESIGNATURE.size()];
+                std::string infname(args[i]), outfname(args[i]);
+                outfname = outfname.substr(0,outfname.size()-bconst::extension.size());
+                std::ofstream output_file(outfname, std::ios::binary | std::ios::trunc);
+                output_file.close();
+                output_file.open(outfname, std::ios::binary | std::ios::app);
 
-                bconst::bytestream filesig(filebytestream.end()-bconst::FILESIGNATURE.size(),filebytestream.end());
+                std::ifstream curr_file(infname,std::ios::binary);
 
-                if(filesig!=bconst::FILESIGNATURE)
+                curr_file.read(filesig,bconst::FILESIGNATURE.size());
+
+                if(memcmp(filesig,bconst::FILESIGNATURE.data(),bconst::FILESIGNATURE.size()))
                 {
                     std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
-                    continue;
+                }
+                else
+                {
+                    char* initialIV = new char[AES_BLOCKSIZE];
+                    curr_file.read(initialIV,AES_BLOCKSIZE);
+
+                    lastBlockKrypt.setIV(reinterpret_cast<unsigned char*>(initialIV));
+                    blocksNoPadding.setIV(reinterpret_cast<unsigned char*>(initialIV));
+
+                    while(!curr_file.eof())
+                    {
+                        curr_file.read(tbuffer,BUFFER_BYTESIZE);
+                        size_t read_buffer_size = curr_file.gcount();
+
+                        if(!curr_file.eof())
+                        {
+                            Krypt::ByteArray recover = blocksNoPadding.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size);
+                            output_file.write(reinterpret_cast<char*>(recover.array),recover.length);
+                            blocksNoPadding.setIV(recover.array+(read_buffer_size-AES_BLOCKSIZE));
+                            lastBlockKrypt.setIV(recover.array+(read_buffer_size-AES_BLOCKSIZE));
+                        }
+                        else
+                        {
+                            Krypt::ByteArray recover = lastBlockKrypt.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size);
+                            output_file.write(reinterpret_cast<char*>(recover.array),recover.length);  
+                        }
+                    }
+
+                    delete [] initialIV;
                 }
 
-                bconst::bytestream iv(
-                    filebytestream.end()-AES_BLOCKSIZE-bconst::FILESIGNATURE.size(),
-                    filebytestream.end()-bconst::FILESIGNATURE.size()
-                );
-
-                krypt.setIV(iv.data());
-
-                unsigned int output_len = filebytestream.size()-iv.size()-bconst::FILESIGNATURE.size();
-
-                bconst::byte* decrypt_raw;
-                #ifndef USE_CRYPTOPP
-                Krypt::ByteArray cipher = krypt.decrypt(filebytestream.data(),output_len);
-                output_len = cipher.length;
-                decrypt_raw = cipher.detach();
-                #else
-                decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
-                #endif
-                
-                std::string output_filename(args[i]);
-                output_filename = output_filename.substr(0,output_filename.size()-bconst::extension.size());
-
-                cnt += byteio::file_write(output_filename,decrypt_raw,output_len);
-                CHECKIF_REPLACE(args[COMMAND],args[i]);
-                delete [] decrypt_raw;
+                delete [] tbuffer;
+                delete [] filesig;
+                ///////////////////
             }
             TIMING_END("De");
         }

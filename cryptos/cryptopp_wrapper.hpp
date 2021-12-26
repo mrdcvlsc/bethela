@@ -37,7 +37,7 @@ void printArrayHex(const std::string& name, unsigned char *array, size_t length)
 	std::cout << name << ": " << encoded << std::endl;
 }
 
-unsigned char* CryptoPP_AES_encrypt_CBC(unsigned char in[], unsigned int inLen, unsigned  char key[], int keyByteLength, unsigned char * iv, unsigned int &outLen)
+unsigned char* CryptoPP_AES_encrypt_CBC(unsigned char in[], unsigned int inLen, unsigned  char key[], int keyByteLength, unsigned char * iv, size_t &outLen)
 {
     std::string plain(reinterpret_cast<const char*>(in),inLen);
     std::string cipher;
