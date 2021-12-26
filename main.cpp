@@ -232,6 +232,7 @@ int main(int argc, char* args[])
                         throw std::logic_error("enc: something wrong happend");
                     }
                 }
+                cnt++;
                 delete [] iv;
                 delete [] tbuffer;
                 CHECKIF_REPLACE(args[COMMAND],args[i]);
@@ -300,6 +301,7 @@ int main(int argc, char* args[])
                         }
                     }
                     delete [] iv;
+                    cnt++;
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
                 }
 
