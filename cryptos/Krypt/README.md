@@ -6,15 +6,17 @@ Forked From : https://github.com/SergeyBel/AES
 
 This fork was optimized and used by my file [encryption/decryption program](https://github.com/mrdcvlsc/bethela).
 
-**This is a portable software implementation, no Inline assembly, no SIMD intrinsics, so performance won't be as fast as optimized libraries like OpenSSL or Crypto++, it only relies on compiler optimizations for better performance.**
+**This header only library provides AES encryption and decryption algorithms, it has a portable C++ implementation and you can also activate and use the code that utilizes the AES-NI instructions.**
 
-![Tests](https://github.com/mrdcvlsc/AES/actions/workflows/google-test.yml/badge.svg)
+![build-test](https://github.com/mrdcvlsc/AES/actions/workflows/google-test.yml/badge.svg)
 
 -----------
 
 **Compilation Note:** This is a header only library, you only need to include the ```"Krypt.hpp"```, no need to compile the library first, and there's no need to add/link the ```.cpp``` files of the library to your compilation flag, see the example below.
 
-***To get the peak performance of this portable library compile it with the flags ```-D PADDING_CHECK_DISABLE -O3 -march=native```***
+***To get the peak performance of this portable library compile it with the flags ```-O3 -march=native```***
+
+***If your system supports AES-NI instructions, just add the option ```-D USE_AESNI -maes``` in compilation to boost the performance.***
 
 **sample program:**
 ```c++
@@ -41,13 +43,14 @@ int main()
 
     Mode::ECB<BlockCipher::AES,Padding::ANSI_X9_23> krypt(aes128key,sizeof(aes128key));
 
-    // `Krypt::Bytes` is just a typedef for `unsigned char`
     ByteArray cipher  = krypt.encrypt(plain,sizeof(plain));
-    ByteArray recover = krypt.decrypt(cipher.first,cipher.second);
+    ByteArray recover = krypt.decrypt(cipher.array(),cipher.length());
 }
 ```
 
-**compile with** ```g++ sample.cpp -D PADDING_CHECK_DISABLE -o sample.exe -O3 -march=native```
+**compile with [pure c/c++ code]** ```g++ -o sample.exe sample.cpp -O3 -march=native```
+
+**comple with [AES-NI]** ```g++ -o sample.exe sample.cpp -D USE_AESNI -maes -O3 -march=native```
 
 -------------
 
@@ -63,9 +66,21 @@ int main()
 
 <br>
 
+**Methods of the Classes inside the ```Mode``` namespace**
+- ```encrypt()```
+- ```decrypt()```
+
+**Methods of the Classes inside the ```BlockCipher``` namespace**
+- ```EncryptBlock()```
+- ```DecryptBlock()```
+
+**Methods of the Classes inside the ```Padding``` namespace**
+- ```AddPadding()```
+- ```RemovePadding()```
+
 **The ```ByteArray``` class** is used to hold the output of ```encrypt()/decrypt()``` methods of the ```Mode``` classes, and the output of ```AddPadding()/RemovePadding()``` methods of the ```Padding``` classes... ```ByteArray``` methods are listed below :
-- ```length()``` - returns the size of the byte array
-- ```array()``` - returns the byte array pointer[```Krypt::Bytes* or unsigned char*```]
+- ```length``` - returns the size of the byte array
+- ```array``` - returns the byte array pointer[```Krypt::Bytes* or unsigned char*```]
 - ```detach()``` - returns the byte array pointer[```Krypt::Bytes* or unsigned char*```], that pointer is then dettached to the instance of the ByteArray
 - ```operator<<``` - an overload for the left-shift operator
 - ```operator>>``` - an overload for the right-shift operator

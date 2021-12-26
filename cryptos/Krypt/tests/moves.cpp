@@ -17,35 +17,126 @@ int main()
         0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
     };
 
-    Mode::ECB<BlockCipher::AES,Padding::ANSI_X9_23> krypt(aes128key,sizeof(aes128key));
+    unsigned char IV[16] = {
+        0x10, 0xa1, 0xf2, 0x0a, 0xb4, 0x55, 0x76, 0x00,
+        0x8c, 0xa9, 0x8a, 0xc7, 0xcc, 0x7d, 0xee, 0xff
+    };
+
+    Mode::ECB<BlockCipher::AES,Padding::ANSI_X9_23> kryptECB(aes128key,sizeof(aes128key));
+    Mode::CBC<BlockCipher::AES,Padding::ANSI_X9_23> kryptCBC(aes128key,sizeof(aes128key));
+    Mode::CFB<BlockCipher::AES,Padding::ANSI_X9_23> kryptCFB(aes128key,sizeof(aes128key));
 
     {
-        ByteArray cipher  = krypt.encrypt(plain,sizeof(plain));
-        ByteArray recover = krypt.decrypt(cipher.first,cipher.second);
+        std::cout << "ECB : encrypt\n";
+        ByteArray cipher  = kryptECB.encrypt(plain,sizeof(plain));
+        std::cout << "ECB : decrypt\n";
+        ByteArray recover = kryptECB.decrypt(cipher.array,cipher.length);
+
+        if(memcmp(recover.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
     }
-    std::cout << "std::pair Move to ByteArray     - Passed\n";
+    std::cout << "ECB : std::pair Move to ByteArray     - Passed\n";
     
 
     {
-        ByteArray cipher  = krypt.encrypt(plain,sizeof(plain));
-        cipher = krypt.decrypt(cipher.first,cipher.second);
+        ByteArray cipher = kryptECB.encrypt(plain,sizeof(plain));
+        cipher = kryptECB.decrypt(cipher.array,cipher.length);
+        if(memcmp(cipher.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
     }
-    std::cout << "std::pair Assign to ByteArray 1 - Passed\n";
+    std::cout << "ECB : std::pair Assign to ByteArray 1 - Passed\n";
     
 
     {
-        ByteArray cipher  = krypt.encrypt(plain,sizeof(plain));
+        ByteArray cipher  = kryptECB.encrypt(plain,sizeof(plain));
         ByteArray recover;
-        recover = krypt.decrypt(cipher.first,cipher.second);
+        recover = kryptECB.decrypt(cipher.array,cipher.length);
+        if(memcmp(recover.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
     }
-    std::cout << "std::pair Assign to ByteArray 2 - Passed\n";
+    std::cout << "ECB : std::pair Assign to ByteArray 2 - Passed\n";
     
 
     {
-        ByteArray cipher  = krypt.encrypt(plain,sizeof(plain));
-        ByteArray recover = krypt.decrypt(cipher.first,cipher.second);
+        ByteArray cipher  = kryptECB.encrypt(plain,sizeof(plain));
+        ByteArray recover = kryptECB.decrypt(cipher.array,cipher.length);
 
         cipher = recover;
+        if(memcmp(cipher.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
     }
-    std::cout << "ByteArray Copied to ByteArray   - Passed\n";
+    std::cout << "ECB : ByteArray Copied to ByteArray   - Passed\n";
+
+
+    /// 
+
+    {
+        std::cout << "CBC : encrypt\n";
+        ByteArray cipher  = kryptCBC.encrypt(plain,sizeof(plain),IV);
+        std::cout << "CBC : decrypt\n";
+        ByteArray recover = kryptCBC.decrypt(cipher.array,cipher.length,IV);
+        if(memcmp(recover.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CBC : std::pair Move to ByteArray     - Passed\n";
+    
+
+    {
+        ByteArray cipher = kryptCBC.encrypt(plain,sizeof(plain),IV);
+        cipher = kryptCBC.decrypt(cipher.array,cipher.length,IV);
+        if(memcmp(cipher.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CBC : std::pair Assign to ByteArray 1 - Passed\n";
+    
+
+    {
+        ByteArray cipher  = kryptCBC.encrypt(plain,sizeof(plain),IV);
+        ByteArray recover;
+        recover = kryptCBC.decrypt(cipher.array,cipher.length,IV);
+        if(memcmp(recover.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CBC : std::pair Assign to ByteArray 2 - Passed\n";
+    
+
+    {
+        ByteArray cipher  = kryptCBC.encrypt(plain,sizeof(plain),IV);
+        ByteArray recover = kryptCBC.decrypt(cipher.array,cipher.length,IV);
+
+        cipher = recover;
+        if(memcmp(cipher.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CBC : ByteArray Copied to ByteArray   - Passed\n";
+
+    ///
+
+    {
+        std::cout << "CFB : encrypt\n";
+        ByteArray cipher  = kryptCFB.encrypt(plain,sizeof(plain),IV);
+        std::cout << "CFB : decrypt\n";
+        ByteArray recover = kryptCFB.decrypt(cipher.array,cipher.length,IV);
+        if(memcmp(recover.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CFB : std::pair Move to ByteArray     - Passed\n";
+    
+
+    {
+        ByteArray cipher = kryptCFB.encrypt(plain,sizeof(plain),IV);
+        cipher = kryptCFB.decrypt(cipher.array,cipher.length,IV);
+        if(memcmp(cipher.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CFB : std::pair Assign to ByteArray 1 - Passed\n";
+    
+
+    {
+        ByteArray cipher  = kryptCFB.encrypt(plain,sizeof(plain),IV);
+        ByteArray recover;
+        recover = kryptCFB.decrypt(cipher.array,cipher.length,IV);
+        if(memcmp(recover.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CFB : std::pair Assign to ByteArray 2 - Passed\n";
+    
+
+    {
+        ByteArray cipher  = kryptCFB.encrypt(plain,sizeof(plain),IV);
+        ByteArray recover = kryptCFB.decrypt(cipher.array,cipher.length,IV);
+
+        cipher = recover;
+        if(memcmp(cipher.array,plain,sizeof(plain))) throw std::logic_error("Wrong decryption output");
+    }
+    std::cout << "CFB : ByteArray Copied to ByteArray   - Passed\n";
 }
