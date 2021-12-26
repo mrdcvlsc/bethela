@@ -9,9 +9,9 @@ A simple terminal command line tool for symmetric encrpytion & decryption of any
 <ul>
 
 ```
-wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v3.4.4.tar.gz
-tar -xf v3.4.4..tar.gz
-cd bethela-3.4.4
+wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v3.5.4.tar.gz
+tar -xf v3.5.4..tar.gz
+cd bethela-3.5.4
 make
 make install
 ```
