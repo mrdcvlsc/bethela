@@ -192,9 +192,6 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
 
-            Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
-            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
-
             TIMING_START;
             size_t cnt = 0;
 
@@ -202,6 +199,9 @@ int main(int argc, char* args[])
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
+                Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
+                Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
+
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 std::string infname(args[i]), outfname(args[i]+bconst::extension);
                 std::ifstream curr_file(infname,std::ios::binary);
@@ -221,20 +221,25 @@ int main(int argc, char* args[])
                     curr_file.read(tbuffer,BUFFER_BYTESIZE);
                     size_t read_buffer_size = curr_file.gcount();
 
-                    if(!curr_file.eof())
+                    if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
                     {
                         Krypt::ByteArray cipher = blocksNoPadding.encrypt(reinterpret_cast<unsigned char*>(tbuffer),BUFFER_BYTESIZE);
                         output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
                         blocksNoPadding.setIV(cipher.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE));
                         lastBlockKrypt.setIV(cipher.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE));
                     }
-                    else
+                    else if(curr_file.eof())
                     {
                         Krypt::ByteArray cipher = lastBlockKrypt.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size);
                         output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
                     }
+                    else
+                    {
+                        throw std::logic_error("enc: something wrong happend");
+                    }
                 }
                 delete [] tbuffer;
+                CHECKIF_REPLACE(args[COMMAND],args[i]);
             }
             TIMING_END("En");
         }
@@ -245,9 +250,6 @@ int main(int argc, char* args[])
             emptyFileArgs(args[COMMAND],argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
-            
-            Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
-            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
             size_t cnt = 0;
@@ -256,6 +258,9 @@ int main(int argc, char* args[])
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
+                Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
+                Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
+
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 char* filesig = new char[bconst::FILESIGNATURE.size()];
                 std::string infname(args[i]), outfname(args[i]);
@@ -285,17 +290,21 @@ int main(int argc, char* args[])
                         curr_file.read(tbuffer,BUFFER_BYTESIZE);
                         size_t read_buffer_size = curr_file.gcount();
 
-                        if(!curr_file.eof())
+                        if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
                         {
                             Krypt::ByteArray recover = blocksNoPadding.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size);
                             output_file.write(reinterpret_cast<char*>(recover.array),recover.length);
                             blocksNoPadding.setIV(recover.array+(read_buffer_size-AES_BLOCKSIZE));
                             lastBlockKrypt.setIV(recover.array+(read_buffer_size-AES_BLOCKSIZE));
                         }
-                        else
+                        else if(curr_file.eof())
                         {
                             Krypt::ByteArray recover = lastBlockKrypt.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size);
                             output_file.write(reinterpret_cast<char*>(recover.array),recover.length);  
+                        }
+                        else
+                        {
+                            throw std::logic_error("something wrong happen");
                         }
                     }
 
@@ -304,6 +313,7 @@ int main(int argc, char* args[])
 
                 delete [] tbuffer;
                 delete [] filesig;
+                CHECKIF_REPLACE(args[COMMAND],args[i]);
                 ///////////////////
             }
             TIMING_END("De");

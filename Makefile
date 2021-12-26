@@ -29,6 +29,16 @@ else
 endif
 	@echo "compilation done."
 
+aesni_debug:
+	@echo "compiling with AES-NI-debug support"
+ifeq ($(OS), Linux)
+	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O3 -march=native -o ${EXECUTABLE}
+else
+	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
+	@$(CC) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+endif
+	@echo "compilation done."
+
 cryptopp:
 	@echo "compiliing executable with cryptopp"
 	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp -fopenmp -O3 -march=native
