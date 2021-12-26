@@ -14,40 +14,31 @@ namespace Krypt::Mode
     }
 
     template<typename CIPHER_TYPE, typename PADDING_TYPE>
-    CBC<CIPHER_TYPE,PADDING_TYPE>::CBC(const Bytes* key, size_t keyLen, const Bytes* IV)
-        : MODE<CIPHER_TYPE,PADDING_TYPE>()
+    ByteArray CBC<CIPHER_TYPE,PADDING_TYPE>::encrypt(Bytes* plain, size_t plainLen, Bytes* iv)
     {
-        this->Encryption = new CIPHER_TYPE(key,keyLen,IV);
-        this->PaddingScheme = new PADDING_TYPE();
-    }
-
-    template<typename CIPHER_TYPE, typename PADDING_TYPE>
-    std::pair<Bytes*,size_t> CBC<CIPHER_TYPE,PADDING_TYPE>::encrypt(Bytes* plain, size_t plainLen)
-    {
-        std::pair<Bytes*,size_t> padded = this->PaddingScheme->AddPadding(plain,plainLen,this->Encryption->BLOCK_SIZE);
+        ByteArray padded = this->PaddingScheme->AddPadding(plain,plainLen,this->Encryption->BLOCK_SIZE);
         Bytes* tempIV = new Bytes[this->Encryption->BLOCK_SIZE];
-        Bytes* cipher = new Bytes[padded.second];
+        Bytes* cipher = new Bytes[padded.length];
 
-        memcpy(tempIV,this->Encryption->IV,this->Encryption->BLOCK_SIZE);
+        memcpy(tempIV,iv,this->Encryption->BLOCK_SIZE);
 
-        for(size_t i=0; i<padded.second; i+=this->Encryption->BLOCK_SIZE)
+        for(size_t i=0; i<padded.length; i+=this->Encryption->BLOCK_SIZE)
         {
-            XorBlocks(tempIV,padded.first+i,tempIV,this->Encryption->BLOCK_SIZE);
+            XorBlocks(tempIV,padded.array+i,tempIV,this->Encryption->BLOCK_SIZE);
             this->Encryption->EncryptBlock(tempIV,cipher+i);
             memcpy(tempIV, cipher+i,this->Encryption->BLOCK_SIZE);
         }
 
-        delete [] padded.first;
         delete [] tempIV;
-        return {cipher,padded.second};
+        return {cipher,padded.length};
     }
 
     template<typename CIPHER_TYPE, typename PADDING_TYPE>
-    std::pair<Bytes*,size_t> CBC<CIPHER_TYPE,PADDING_TYPE>::decrypt(Bytes* cipher, size_t cipherLen)
+    ByteArray CBC<CIPHER_TYPE,PADDING_TYPE>::decrypt(Bytes* cipher, size_t cipherLen, Bytes* iv)
     {
         Bytes* recover = new Bytes[cipherLen];
         Bytes* tempIV  = new Bytes[this->Encryption->BLOCK_SIZE];
-        memcpy(tempIV,this->Encryption->IV,this->Encryption->BLOCK_SIZE);
+        memcpy(tempIV,iv,this->Encryption->BLOCK_SIZE);
 
         for(size_t i=0; i<cipherLen; i+=this->Encryption->BLOCK_SIZE)
         {
@@ -56,18 +47,12 @@ namespace Krypt::Mode
             memcpy(tempIV, cipher+i,this->Encryption->BLOCK_SIZE);
         }
 
-        std::pair<Bytes*,size_t> recoverNoPadding = this->PaddingScheme->RemovePadding(recover,cipherLen,this->Encryption->BLOCK_SIZE);
+        ByteArray recoverNoPadding = this->PaddingScheme->RemovePadding(recover,cipherLen,this->Encryption->BLOCK_SIZE);
 
         delete [] tempIV;
         delete [] recover;
 
         return recoverNoPadding;
-    }
-
-    template<typename CIPHER_TYPE, typename PADDING_TYPE>
-    void CBC<CIPHER_TYPE,PADDING_TYPE>::setIV(Bytes* iv)
-    {
-        this->Encryption->setIV(iv);
     }
 }
 

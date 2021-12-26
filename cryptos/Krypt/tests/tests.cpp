@@ -109,13 +109,13 @@ TEST(Padding, LENGTH_4TO8_ZeroNulls)
   unsigned char *heap_plain = new unsigned char[sizeof(plain)];
   memcpy(heap_plain,plain,sizeof(plain));
 
-  std::pair<Krypt::Bytes*,size_t> padded = padding.AddPadding(heap_plain,sizeof(plain),8);
-  ASSERT_FALSE(memcmp(padded.first,padded_plain,padded.second));
+  Krypt::ByteArray padded = padding.AddPadding(heap_plain,sizeof(plain),8);
+  ASSERT_FALSE(memcmp(padded.array,padded_plain,padded.length));
 
-  std::pair<Krypt::Bytes*,size_t> recover = padding.RemovePadding(padded.first,padded.second,8);
-  ASSERT_FALSE(memcmp(recover.first,plain,recover.second));
+  Krypt::ByteArray recover = padding.RemovePadding(padded.array,padded.length,8);
+  ASSERT_FALSE(memcmp(recover.array,plain,recover.length));
 
-  delete [] heap_plain; delete [] padded.first; delete [] recover.first;
+  delete [] heap_plain;
 }
 
 TEST(Padding, LENGTH_4TO8_PKCS_5_7)
@@ -133,13 +133,13 @@ TEST(Padding, LENGTH_4TO8_PKCS_5_7)
   unsigned char *heap_plain = new unsigned char[sizeof(plain)];
   memcpy(heap_plain,plain,sizeof(plain));
 
-  std::pair<Krypt::Bytes*,size_t> padded = padding.AddPadding(heap_plain,sizeof(plain),8);
-  ASSERT_FALSE(memcmp(padded.first,padded_plain,padded.second));
+  Krypt::ByteArray padded = padding.AddPadding(heap_plain,sizeof(plain),8);
+  ASSERT_FALSE(memcmp(padded.array,padded_plain,padded.length));
 
-  std::pair<Krypt::Bytes*,size_t> recover = padding.RemovePadding(padded.first,padded.second,8);
-  ASSERT_FALSE(memcmp(recover.first,plain,recover.second));
+  Krypt::ByteArray recover = padding.RemovePadding(padded.array,padded.length,8);
+  ASSERT_FALSE(memcmp(recover.array,plain,recover.length));
 
-  delete [] heap_plain; delete [] padded.first; delete [] recover.first;
+  delete [] heap_plain;
 }
 
 TEST(Padding, LENGTH_4TO8_ISO_IEC_7816_4)
@@ -157,13 +157,13 @@ TEST(Padding, LENGTH_4TO8_ISO_IEC_7816_4)
   unsigned char *heap_plain = new unsigned char[sizeof(plain)];
   memcpy(heap_plain,plain,sizeof(plain));
 
-  std::pair<Krypt::Bytes*,size_t> padded = padding.AddPadding(heap_plain,sizeof(plain),8);
-  ASSERT_FALSE(memcmp(padded.first,padded_plain,padded.second));
+  Krypt::ByteArray padded = padding.AddPadding(heap_plain,sizeof(plain),8);
+  ASSERT_FALSE(memcmp(padded.array,padded_plain,padded.length));
 
-  std::pair<Krypt::Bytes*,size_t> recover = padding.RemovePadding(padded.first,padded.second,8);
-  ASSERT_FALSE(memcmp(recover.first,plain,recover.second));
+  Krypt::ByteArray recover = padding.RemovePadding(padded.array,padded.length,8);
+  ASSERT_FALSE(memcmp(recover.array,plain,recover.length));
 
-  delete [] heap_plain; delete [] padded.first; delete [] recover.first;
+  delete [] heap_plain;
 }
 
 TEST(Padding, LENGTH_4TO8_ANSI_X9_23)
@@ -181,13 +181,13 @@ TEST(Padding, LENGTH_4TO8_ANSI_X9_23)
   unsigned char *heap_plain = new unsigned char[sizeof(plain)];
   memcpy(heap_plain,plain,sizeof(plain));
 
-  std::pair<Krypt::Bytes*,size_t> padded = padding.AddPadding(heap_plain,sizeof(plain),8);
-  ASSERT_FALSE(memcmp(padded.first,padded_plain,padded.second));
+  Krypt::ByteArray padded = padding.AddPadding(heap_plain,sizeof(plain),8);
+  ASSERT_FALSE(memcmp(padded.array,padded_plain,padded.length));
 
-  std::pair<Krypt::Bytes*,size_t> recover = padding.RemovePadding(padded.first,padded.second,8);
-  ASSERT_FALSE(memcmp(recover.first,plain,recover.second));
+  Krypt::ByteArray recover = padding.RemovePadding(padded.array,padded.length,8);
+  ASSERT_FALSE(memcmp(recover.array,plain,recover.length));
 
-  delete [] heap_plain; delete [] padded.first; delete [] recover.first;
+  delete [] heap_plain;
 }
 
 // #####################################################################
@@ -211,13 +211,10 @@ TEST(ModeECB, ECB_ZeroNulls_AES128)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_PKCS_5_7_AES128)
@@ -237,13 +234,10 @@ TEST(ModeECB, ECB_PKCS_5_7_AES128)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_ISO_IEC_7816_4_AES128)
@@ -263,13 +257,10 @@ TEST(ModeECB, ECB_ISO_IEC_7816_4_AES128)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_ANSI_X9_23_AES128)
@@ -289,13 +280,10 @@ TEST(ModeECB, ECB_ANSI_X9_23_AES128)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // ######################### MODE ECB - AES192 #########################
@@ -318,13 +306,10 @@ TEST(ModeECB, ECB_ZeroNulls_AES192)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_PKCS_5_7_AES192)
@@ -345,13 +330,10 @@ TEST(ModeECB, ECB_PKCS_5_7_AES192)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_ISO_IEC_7816_4_AES192)
@@ -372,13 +354,10 @@ TEST(ModeECB, ECB_ISO_IEC_7816_4_AES192)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_ANSI_X9_23_AES192)
@@ -399,13 +378,10 @@ TEST(ModeECB, ECB_ANSI_X9_23_AES192)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // ######################### MODE ECB - AES256 #########################
@@ -429,13 +405,10 @@ TEST(ModeECB, ECB_ZeroNulls_AES256)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_PKCS_5_7_AES256)
@@ -457,13 +430,10 @@ TEST(ModeECB, ECB_PKCS_5_7_AES256)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_ISO_IEC_7816_4_AES256)
@@ -485,13 +455,10 @@ TEST(ModeECB, ECB_ISO_IEC_7816_4_AES256)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeECB, ECB_ANSI_X9_23_AES256)
@@ -513,13 +480,10 @@ TEST(ModeECB, ECB_ANSI_X9_23_AES256)
   };
 
   Krypt::Mode::ECB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain));
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // #####################################################################
@@ -542,14 +506,11 @@ TEST(ModeCBC, CBC_ZeroNulls_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_PKCS_5_7_AES128)
@@ -568,14 +529,11 @@ TEST(ModeCBC, CBC_PKCS_5_7_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_ISO_IEC_7816_4_AES128)
@@ -594,14 +552,11 @@ TEST(ModeCBC, CBC_ISO_IEC_7816_4_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_ANSI_X9_23_AES128)
@@ -620,14 +575,11 @@ TEST(ModeCBC, CBC_ANSI_X9_23_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // ######################### MODE CBC - AES192 #########################
@@ -649,14 +601,11 @@ TEST(ModeCBC, CBC_ZeroNulls_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_PKCS_5_7_AES192)
@@ -676,14 +625,11 @@ TEST(ModeCBC, CBC_PKCS_5_7_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_ISO_IEC_7816_4_AES192)
@@ -703,14 +649,11 @@ TEST(ModeCBC, CBC_ISO_IEC_7816_4_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_ANSI_X9_23_AES192)
@@ -730,14 +673,11 @@ TEST(ModeCBC, CBC_ANSI_X9_23_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // ######################### MODE CBC - AES256 #########################
@@ -760,14 +700,11 @@ TEST(ModeCBC, CBC_ZeroNulls_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_PKCS_5_7_AES256)
@@ -788,14 +725,11 @@ TEST(ModeCBC, CBC_PKCS_5_7_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_ISO_IEC_7816_4_AES256)
@@ -816,14 +750,11 @@ TEST(ModeCBC, CBC_ISO_IEC_7816_4_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCBC, CBC_ANSI_X9_23_AES256)
@@ -844,14 +775,11 @@ TEST(ModeCBC, CBC_ANSI_X9_23_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CBC<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // #####################################################################
@@ -874,14 +802,11 @@ TEST(ModeCFB, CFB_ZeroNulls_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_PKCS_5_7_AES128)
@@ -900,14 +825,11 @@ TEST(ModeCFB, CFB_PKCS_5_7_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_ISO_IEC_7816_4_AES128)
@@ -926,14 +848,11 @@ TEST(ModeCFB, CFB_ISO_IEC_7816_4_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_ANSI_X9_23_AES128)
@@ -952,14 +871,11 @@ TEST(ModeCFB, CFB_ANSI_X9_23_AES128)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // ######################### MODE CFB - AES192 #########################
@@ -981,14 +897,11 @@ TEST(ModeCFB, CFB_ZeroNulls_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_PKCS_5_7_AES192)
@@ -1008,14 +921,11 @@ TEST(ModeCFB, CFB_PKCS_5_7_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_ISO_IEC_7816_4_AES192)
@@ -1035,14 +945,11 @@ TEST(ModeCFB, CFB_ISO_IEC_7816_4_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_ANSI_X9_23_AES192)
@@ -1062,14 +969,11 @@ TEST(ModeCFB, CFB_ANSI_X9_23_AES192)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 // ######################### MODE CFB - AES256 #########################
@@ -1092,14 +996,11 @@ TEST(ModeCFB, CFB_ZeroNulls_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ZeroNulls> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_PKCS_5_7_AES256)
@@ -1120,14 +1021,11 @@ TEST(ModeCFB, CFB_PKCS_5_7_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::PKCS_5_7> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_ISO_IEC_7816_4_AES256)
@@ -1148,14 +1046,11 @@ TEST(ModeCFB, CFB_ISO_IEC_7816_4_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ISO_IEC_7816_4> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 TEST(ModeCFB, CFB_ANSI_X9_23_AES256)
@@ -1176,14 +1071,11 @@ TEST(ModeCFB, CFB_ANSI_X9_23_AES256)
       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
   };
 
-  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey),iv);
-  std::pair<Krypt::Bytes*,size_t> encrypted = EncScheme.encrypt(plain,sizeof(plain));
-  std::pair<Krypt::Bytes*,size_t> decrypted = EncScheme.decrypt(encrypted.first,encrypted.second);
+  Krypt::Mode::CFB<Krypt::BlockCipher::AES,Krypt::Padding::ANSI_X9_23> EncScheme(aeskey,sizeof(aeskey));
+  Krypt::ByteArray encrypted = EncScheme.encrypt(plain,sizeof(plain),iv);
+  Krypt::ByteArray decrypted = EncScheme.decrypt(encrypted.array,encrypted.length,iv);
 
-  ASSERT_FALSE(memcmp(decrypted.first,plain,decrypted.second));
-  
-  delete [] encrypted.first;
-  delete [] decrypted.first;
+  ASSERT_FALSE(memcmp(decrypted.array,plain,decrypted.length));
 }
 
 int main(int argc, char *argv[])

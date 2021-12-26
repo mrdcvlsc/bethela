@@ -105,6 +105,21 @@ namespace keygen
         return random_bytes;
     }
 
+    bconst::byte* random_bytestream_array(size_t byte_count)
+    {
+        bconst::byte* random_bytes = new bconst::byte[byte_count];
+
+        unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+        std::mt19937_64 rand_engine(seed);
+        std::uniform_int_distribution<int> random_number(bconst::MIN,bconst::MAX);
+
+
+        for(size_t i=0; i<byte_count; ++i)
+            random_bytes[i] = random_number(rand_engine);
+
+        return random_bytes;
+    }
+
     void AES_KEYCHECK(const bconst::bytestream& AES_KEY, size_t GIVEN_AES_KEY_SIZE)
     {
         if(AES_KEY.size()==32 || AES_KEY.size()==24 || AES_KEY.size()==16)

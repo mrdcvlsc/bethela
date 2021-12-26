@@ -2,15 +2,23 @@
 #define CIPHER_BLOCK_CPP
 
 #include "../../blockcipher.hpp"
+
+#ifdef USE_AESNI
 #include "simd_aes.hpp"
+#endif
 
 namespace Krypt::BlockCipher
 {
     void AES::EncryptBlock(Bytes *src, Bytes *dest)
     {
         #ifdef USE_AESNI
-        AesBlockEncrypt(src,dest,RoundedKeys,Nr,Nb);
-        return;
+        switch (Nr)
+        {
+          case 10: Aes128BlockEncrypt(src,dest,RoundedKeys,Nr,Nb); break;
+          case 12: Aes192BlockEncrypt(src,dest,RoundedKeys,Nr,Nb); break;
+          case 14: Aes256BlockEncrypt(src,dest,RoundedKeys,Nr,Nb); break;
+          default: throw std::invalid_argument("Incorrect key length");
+        }
         #else
 
         Bytes state[4][4];
@@ -52,8 +60,13 @@ namespace Krypt::BlockCipher
     void AES::DecryptBlock(Bytes *src, Bytes *dest)
     {
         #ifdef USE_AESNI
-        AesBlockDecrypt(src,dest,RoundedKeys,Nr,Nb);
-        return;
+        switch (Nr)
+        {
+          case 10: Aes128BlockDecrypt(src,dest,RoundedKeys,Nr,Nb); break;
+          case 12: Aes192BlockDecrypt(src,dest,RoundedKeys,Nr,Nb); break;
+          case 14: Aes256BlockDecrypt(src,dest,RoundedKeys,Nr,Nb); break;
+          default: throw std::invalid_argument("Incorrect key length");
+        }
         #else
 
         Bytes state[4][4];
