@@ -32,24 +32,24 @@ endif
 aesni_debug:
 	@echo "compiling with AES-NI-debug support"
 ifeq ($(OS), Linux)
-	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O3 -march=native -o ${EXECUTABLE}
+	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O3 -march=native -o ${EXECUTABLE} -fsanitize=address
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CC) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+	@$(CC) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3 -fsanitize=address
 endif
 	@echo "compilation done."
 
-cryptopp:
-	@echo "compiliing executable with cryptopp"
-	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp -fopenmp -O3 -march=native
+# cryptopp:
+# 	@echo "compiliing executable with cryptopp"
+# 	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp -fopenmp -O3 -march=native
 
-cryptopp_debug:
-	@echo "compiliing executable with cryptopp"
-	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address -fopenmp -O0 -Wall -Wextra
+# cryptopp_debug:
+# 	@echo "compiliing executable with cryptopp"
+# 	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address -fopenmp -O0 -Wall -Wextra
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
-	$(CC) main.cpp -o ${EXECUTABLE} -Wall -Wextra -O0 -fopenmp -g -fsanitize=address
+	$(CC) main.cpp -o ${EXECUTABLE} -Wall -Wextra -O3 -fopenmp -fsanitize=address
 	@echo "compiling done"
 
 install:
@@ -73,7 +73,7 @@ test:
 	@echo "-----------------------------------------------------------"
 	@echo "===============   COMPLING PORTABLE AES  =================="
 	@echo "-----------------------------------------------------------"
-	@make
+	@make debug_linux
 	@echo "-----------------------------------------------------------"
 	@echo "====================   GENERATE KEYS   ===================="
 	@echo "-----------------------------------------------------------"
@@ -99,7 +99,7 @@ test:
 	@echo "-----------------------------------------------------------"
 	@echo "===============   COMPILING AES-NI AES   ================="
 	@echo "-----------------------------------------------------------"
-	@make aesni
+	@make aesni_debug
 	@echo "-----------------------------------------------------------"
 	@echo "===============   TESTING AES-NI AES   ===================="
 	@echo "-----------------------------------------------------------"

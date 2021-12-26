@@ -3,10 +3,7 @@
 #include <chrono>
 #include <omp.h>
 
-#if defined(USE_CRYPTOPP)
-#include "cryptos/cryptopp_wrapper.hpp"
-#define CRYPTOLIB "crypto++"
-#elif defined(USE_AESNI)
+#if defined(USE_AESNI)
 #define CRYPTOLIB "AES-NI"
 #else
 #define CRYPTOLIB "portable"
