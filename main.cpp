@@ -208,9 +208,9 @@ int main(int argc, char* args[])
 
                     bconst::byte* encrypt_raw;
                     #ifndef USE_CRYPTOPP
-                    std::pair<bconst::byte*,size_t> cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
-                    encrypt_raw = cipher.first;
-                    output_len = cipher.second;
+                    Krypt::ByteArray cipher = krypt.encrypt(filebytestream.data(),filebytestream.size());
+                    output_len = cipher.length;
+                    encrypt_raw = cipher.detach();
                     #else
                     encrypt_raw = CryptoPP_AES_encrypt_CBC(filebytestream.data(),filebytestream.size(),loadKey.data(),loadKey.size(),iv.data(),output_len);
                     #endif
@@ -266,9 +266,9 @@ int main(int argc, char* args[])
 
                 bconst::byte* decrypt_raw;
                 #ifndef USE_CRYPTOPP
-                std::pair<bconst::byte*,size_t> cipher = krypt.decrypt(filebytestream.data(),output_len);
-                decrypt_raw = cipher.first;
-                output_len = cipher.second;
+                Krypt::ByteArray cipher = krypt.decrypt(filebytestream.data(),output_len);
+                output_len = cipher.length;
+                decrypt_raw = cipher.detach();
                 #else
                 decrypt_raw = CryptoPP_AES_decrypt_CBC(filebytestream.data(),output_len,loadKey.data(),loadKey.size(),iv.data());
                 #endif
