@@ -32,7 +32,7 @@ endif
 aesni_debug:
 	@echo "compiling with AES-NI-debug support"
 ifeq ($(OS), Linux)
-	@$(CC) -g -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O0 -march=native -o ${EXECUTABLE} -fsanitize=address
+	@$(CC) -g -DRELEASE main.cpp -DUSE_AESNI -maes -Og -march=native -o ${EXECUTABLE} -fsanitize=address
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
 	@$(CC) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
@@ -49,7 +49,7 @@ endif
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
-	$(CC) -g main.cpp -o ${EXECUTABLE} -Wall -Wextra -O0 -fopenmp -fsanitize=address
+	$(CC) -g main.cpp -o ${EXECUTABLE} -Wall -Wextra -Og -fsanitize=address
 	@echo "compiling done"
 
 install:
@@ -71,10 +71,6 @@ endif
 
 test:
 	@echo "-----------------------------------------------------------"
-	@echo "===============   COMPLING PORTABLE AES  =================="
-	@echo "-----------------------------------------------------------"
-	@make debug_linux
-	@echo "-----------------------------------------------------------"
 	@echo "====================   GENERATE KEYS   ===================="
 	@echo "-----------------------------------------------------------"
 	@make genkeys
@@ -82,6 +78,21 @@ test:
 	@echo "=================   GENERATE TEST FILES   ================="
 	@echo "-----------------------------------------------------------"
 	@make randfile
+
+	@echo "-----------------------------------------------------------"
+	@echo "===============   COMPILING AES-NI AES   ================="
+	@echo "-----------------------------------------------------------"
+	@make aesni_debug
+	@echo "-----------------------------------------------------------"
+	@echo "===============   TESTING AES-NI AES   ===================="
+	@echo "-----------------------------------------------------------"
+	@./bethela --version
+	@make aestest	
+	
+	@echo "-----------------------------------------------------------"
+	@echo "===============   COMPLING PORTABLE AES  =================="
+	@echo "-----------------------------------------------------------"
+	@make debug_linux
 	@echo "-----------------------------------------------------------"
 	@echo "===============   TESTING PORTABLE AES  ==================="
 	@echo "-----------------------------------------------------------"
@@ -96,15 +107,7 @@ test:
 # @echo "-----------------------------------------------------------"
 # @./bethela --version
 # @make aestest
-	@echo "-----------------------------------------------------------"
-	@echo "===============   COMPILING AES-NI AES   ================="
-	@echo "-----------------------------------------------------------"
-	@make aesni_debug
-	@echo "-----------------------------------------------------------"
-	@echo "===============   TESTING AES-NI AES   ===================="
-	@echo "-----------------------------------------------------------"
-	@./bethela --version
-	@make aestest	
+
 	@echo "-----------------------------------------------------------"
 	@echo "=================   TESTING VIGENERE   ===================="
 	@echo "-----------------------------------------------------------"

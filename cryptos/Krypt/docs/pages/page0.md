@@ -1,14 +1,13 @@
-# Krypt
+# README.md
+<!-- @mainpage -->
+
+### Main
 
 Forked From : https://github.com/SergeyBel/AES
-
-### About this fork
 
 This fork was optimized and used by my file [encryption/decryption program](https://github.com/mrdcvlsc/bethela).
 
 **This header only library provides AES encryption and decryption algorithms, it has a portable C++ implementation and you can also activate and use the code that utilizes the AES-NI instructions.**
-
-![build-test](https://github.com/mrdcvlsc/AES/actions/workflows/google-test.yml/badge.svg)
 
 -----------
 
@@ -19,7 +18,7 @@ This fork was optimized and used by my file [encryption/decryption program](http
 ***If your system supports AES-NI instructions, just add the option ```-D USE_AESNI -maes``` in compilation to boost the performance.***
 
 **sample program:**
-```c++
+```cpp
 /*    sample.cpp    */
 #include <iostream>
 #include "src/Krypt.hpp"
@@ -56,7 +55,7 @@ int main()
 
 <br>
 
-**```Krypt``` namespace contains the following :**
+**The ```Krypt``` namespace contains the following :**
 
 | sub-namespace | sub-namespace classes |
 | --- | --- |

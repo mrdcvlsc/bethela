@@ -199,6 +199,7 @@ int main(int argc, char* args[])
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
+                std::cout << "file : " << args[i] << "...\n";
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 std::string infname(args[i]), outfname(args[i]+bconst::extension);
                 std::ifstream curr_file(infname,std::ios::binary);
@@ -257,6 +258,7 @@ int main(int argc, char* args[])
             #pragma omp parallel for num_threads(omp_get_max_threads())
             for(int i=STARTING_FILE; i<argc; ++i)
             {
+                std::cout << "file : " << args[i] << "...\n";
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 char* filesig = new char[bconst::FILESIGNATURE.size()];
                 std::string infname(args[i]), outfname(args[i]);
