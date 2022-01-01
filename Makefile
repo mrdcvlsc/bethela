@@ -71,6 +71,18 @@ endif
 
 test:
 	@echo "-----------------------------------------------------------"
+	@echo "==============  Krypt : compiling TEST  ==================="
+	@echo "-----------------------------------------------------------"
+	@$(MAKE) -C cryptos/Krypt compile_test
+	@echo "-----------------------------------------------------------"
+	@echo "===============  Krypt : running TEST  ===================="
+	@echo "-----------------------------------------------------------"
+	@$(MAKE) -C cryptos/Krypt run_test
+	@echo "Krypt tests done!!!"
+	@echo "..."
+	@echo "..."
+	@echo "entered bethela test..."
+	@echo "-----------------------------------------------------------"
 	@echo "====================   GENERATE KEYS   ===================="
 	@echo "-----------------------------------------------------------"
 	@make genkeys
@@ -127,19 +139,22 @@ install_cryptoppp:
 	@sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
 
 aestest:
+	@echo "Validating generated test files first..."
+	@make checkfile
 	@./bethela --enc-AES256-replace tests/AES256.key tests/*.subject
 	@./bethela --dec-AES256-replace tests/AES256.key tests/*.bthl
+	@echo "Checking Output Files For Real..."
 	@make checkfile
 
 randfile:
 	@echo "compiling random file generator"
-	@$(CC) tests/RandFile.cpp -o tests/RandFile -fsanitize=address
+	@$(CC) tests/RandFile.cpp -o tests/RandFile -O3
 	@echo "generating random files..."
 	@cd tests && ./RandFile
 
 checkfile:
 	@echo "compiling equality file checker"
-	@$(CC) tests/FileCompare.cpp -o tests/FileCompare -fsanitize=address
+	@$(CC) tests/FileCompare.cpp -o tests/FileCompare -O3
 	@echo "checking random files equality..."
 	@cd tests && ./FileCompare
 
