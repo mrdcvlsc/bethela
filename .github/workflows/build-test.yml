@@ -13,8 +13,18 @@ jobs:
 
     steps:
     
-    - name: install crypto++
-      run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
+    - name: install cmake
+      run: sudo apt-get install cmake
+
+    - name: install google-benchmark
+      run: sudo apt-get install libbenchmark-dev
+
+    - name: install google-test
+      run: sudo apt-get install libgtest-dev
+    
+#     Dropped Support Currently (will bring back in the future | maybe)
+#     - name: install crypto++
+#       run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
       
     - uses: actions/checkout@v2
     
