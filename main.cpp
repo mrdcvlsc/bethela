@@ -13,7 +13,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/Krypt/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 3.5.4"
+#define BETHELA_VERSION "version 3.5.5"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -202,6 +202,16 @@ int main(int argc, char* args[])
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 std::string infname(args[i]), outfname(args[i]+bconst::extension);
                 std::ifstream curr_file(infname,std::ios::binary);
+
+                if(!curr_file.good())
+                {
+                    std::cout << 
+                        "The file : " << args[i] << "\n"
+                        "was not encrypted...\n"
+                        "it might be read protected, corrupted or non-existent...\n";
+                    continue;
+                }
+                std::cout << "encrypting : " << args[i] << "...\n";
                 
                 Krypt::Bytes* iv = keygen::random_bytestream_array(AES_BLOCKSIZE);
 
@@ -218,12 +228,13 @@ int main(int argc, char* args[])
 
                     if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
                     {
-                        Krypt::ByteArray cipher = blocksNoPadding.encrypt(reinterpret_cast<unsigned char*>(tbuffer),BUFFER_BYTESIZE,iv);
+                        Krypt::ByteArray cipher = blocksNoPadding.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                         output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
                         memcpy(iv,cipher.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE),AES_BLOCKSIZE);
                     }
                     else if(curr_file.eof())
                     {
+                        if(!read_buffer_size) continue;
                         Krypt::ByteArray cipher = lastBlockKrypt.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                         output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
                     }
@@ -264,6 +275,16 @@ int main(int argc, char* args[])
 
                 std::ifstream curr_file(infname,std::ios::binary);
 
+                if(!curr_file.good())
+                {
+                    std::cout << 
+                        "The file : " << args[i] << "\n"
+                        "was not decrypted...\n"
+                        "it might be read protected, corrupted or non-existent...\n";
+                    continue;
+                }
+                std::cout << "decrypting : " << args[i] << "...\n";
+
                 curr_file.read(filesig,bconst::FILESIGNATURE.size());
 
                 if(memcmp(filesig,bconst::FILESIGNATURE.data(),bconst::FILESIGNATURE.size()))
@@ -276,8 +297,8 @@ int main(int argc, char* args[])
                     output_file.close();
                     output_file.open(outfname, std::ios::binary | std::ios::app);
 
-                    char* iv = new char[AES_BLOCKSIZE];
-                    curr_file.read(iv,AES_BLOCKSIZE);
+                    unsigned char* iv = new unsigned char[AES_BLOCKSIZE];
+                    curr_file.read(reinterpret_cast<char*>(iv),AES_BLOCKSIZE);
 
                     while(!curr_file.eof())
                     {
@@ -286,13 +307,14 @@ int main(int argc, char* args[])
 
                         if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
                         {
-                            Krypt::ByteArray recover = blocksNoPadding.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,reinterpret_cast<unsigned char*>(iv));
+                            Krypt::ByteArray recover = blocksNoPadding.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                             output_file.write(reinterpret_cast<char*>(recover.array),recover.length);
-                            memcpy(iv,reinterpret_cast<char*>(recover.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE)),AES_BLOCKSIZE);
+                            memcpy(iv,tbuffer+(BUFFER_BYTESIZE-AES_BLOCKSIZE),AES_BLOCKSIZE);
                         }
                         else if(curr_file.eof())
                         {
-                            Krypt::ByteArray recover = lastBlockKrypt.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,reinterpret_cast<unsigned char*>(iv));
+                            if(!read_buffer_size) continue;
+                            Krypt::ByteArray recover = lastBlockKrypt.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                             output_file.write(reinterpret_cast<char*>(recover.array),recover.length);  
                         }
                         else
