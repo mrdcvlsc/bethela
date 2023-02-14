@@ -16,7 +16,6 @@ endif
 
 all:
 	@echo "compiling portable version..."
-
 ifeq ($(OS), Linux)
 	$(CXX) -static-libgcc -static-libstdc++ $(THREADING) -DRELEASE main.cpp -O3 -march=native -o ${EXECUTABLE}
 else
@@ -31,17 +30,17 @@ ifeq ($(OS), Linux)
 	$(CXX) -static-libgcc -static-libstdc++ $(THREADING) -DRELEASE main.cpp -DUSE_AESNI -maes -O3 -march=native -o ${EXECUTABLE}
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CXX) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+	$(CXX) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
 aesni_debug:
 	@echo "compiling with AES-NI-debug support"
 ifeq ($(OS), Linux)
-	@$(CXX) -g -DRELEASE main.cpp -DUSE_AESNI -maes -Og -march=native -o ${EXECUTABLE} -fsanitize=address
+	$(CXX) -g -DRELEASE main.cpp -DUSE_AESNI -maes -Og -march=native -o ${EXECUTABLE} -fsanitize=address
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CXX) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
+	$(CXX) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
 endif
 	@echo "compilation done."
 
@@ -76,6 +75,7 @@ endif
 # TEST SCRIPTS
 
 test:
+	$(shell mkdir -p cryptos/Krypt/bin)
 	@echo "-----------------------------------------------------------"
 	@echo "==============  Krypt : compiling TEST  ==================="
 	@echo "-----------------------------------------------------------"
