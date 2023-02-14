@@ -12,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
+
+    - name: install libomp for clang
+      sudo apt-get install libomp-dev
+      
     - name: install cmake
       run: sudo apt-get install cmake
 
