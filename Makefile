@@ -6,50 +6,56 @@ INSTALLPATH=/usr/local/bin
 
 OS := $(shell uname)
 
-CC=g++
+CXX:=g++
+
+ifeq ($(CXX), clang++)
+THREADING=-fopenmp
+else
+THREADING=-fopenmp
+endif
 
 all:
 	@echo "compiling portable version..."
 
 ifeq ($(OS), Linux)
-	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -fopenmp -O3 -march=native -o ${EXECUTABLE}
+	$(CXX) -static-libgcc -static-libstdc++ $(THREADING) -DRELEASE main.cpp -O3 -march=native -o ${EXECUTABLE}
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
+	@$(CXX) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
 aesni:
 	@echo "compiling with AES-NI support"
 ifeq ($(OS), Linux)
-	@$(CC) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -DUSE_AESNI -maes -fopenmp -O3 -march=native -o ${EXECUTABLE}
+	$(CXX) -static-libgcc -static-libstdc++ $(THREADING) -DRELEASE main.cpp -DUSE_AESNI -maes -O3 -march=native -o ${EXECUTABLE}
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CC) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+	@$(CXX) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
 aesni_debug:
 	@echo "compiling with AES-NI-debug support"
 ifeq ($(OS), Linux)
-	@$(CC) -g -DRELEASE main.cpp -DUSE_AESNI -maes -Og -march=native -o ${EXECUTABLE} -fsanitize=address
+	@$(CXX) -g -DRELEASE main.cpp -DUSE_AESNI -maes -Og -march=native -o ${EXECUTABLE} -fsanitize=address
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CC) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
+	@$(CXX) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
 endif
 	@echo "compilation done."
 
 # cryptopp:
 # 	@echo "compiliing executable with cryptopp"
-# 	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp -fopenmp -O3 -march=native
+# 	@$(CXX) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp $(THREADING) -O3 -march=native
 
 # cryptopp_debug:
 # 	@echo "compiliing executable with cryptopp"
-# 	@$(CC) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address -fopenmp -O0 -Wall -Wextra
+# 	@$(CXX) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address $(THREADING) -O0 -Wall -Wextra
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"
-	$(CC) -g main.cpp -o ${EXECUTABLE} -Wall -Wextra -Og -fsanitize=address
+	$(CXX) -g main.cpp -o ${EXECUTABLE} -Wall -Wextra -Og -fsanitize=address
 	@echo "compiling done"
 
 install:
@@ -130,7 +136,7 @@ test:
 	@echo "-----------------------------------------------------------"
 	@make clean
 	@echo "-----------------------------------------------------------"
-	@echo "=================   ALL TEST SUCCESS!!!   ================="
+	@echo "=================   ALL TEST SUCXXESS!!!   ================="
 	@echo "-----------------------------------------------------------"
 
 install_cryptoppp:
@@ -149,13 +155,13 @@ aestest:
 
 randfile:
 	@echo "compiling random file generator"
-	@$(CC) tests/RandFile.cpp -o tests/RandFile -O3
+	@$(CXX) tests/RandFile.cpp -o tests/RandFile -O3
 	@echo "generating random files..."
 	@cd tests && ./RandFile
 
 checkfile:
 	@echo "compiling equality file checker"
-	@$(CC) tests/FileCompare.cpp -o tests/FileCompare -O3
+	@$(CXX) tests/FileCompare.cpp -o tests/FileCompare -O3
 	@echo "checking random files equality..."
 	@cd tests && ./FileCompare
 
