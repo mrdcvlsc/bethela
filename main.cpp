@@ -244,6 +244,10 @@ int main(int argc, char* args[])
                     }
                 }
                 cnt++;
+
+                memset((unsigned char*) iv, 0x00, AES_BLOCKSIZE);
+                memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
+
                 delete [] iv;
                 delete [] tbuffer;
                 CHECKIF_REPLACE(args[COMMAND],args[i]);
@@ -322,10 +326,16 @@ int main(int argc, char* args[])
                             throw std::logic_error("something wrong happen");
                         }
                     }
+
+                    memset((unsigned char*) iv, 0x00, AES_BLOCKSIZE);
                     delete [] iv;
+                    
                     cnt++;
                     CHECKIF_REPLACE(args[COMMAND],args[i]);
                 }
+
+                memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
+                memset((char*) filesig, 0x00, bconst::FILESIGNATURE.size());
 
                 delete [] tbuffer;
                 delete [] filesig;
