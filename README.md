@@ -72,3 +72,11 @@ for more information about using AES and other info about the program use the co
 ```
 bethela --help
 ```
+
+### Compiling with clang++
+
+You might need to install `libomp-dev` first when using clang
+
+```
+sudo apt-get install libomp-dev
+```
