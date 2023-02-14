@@ -1,10 +1,10 @@
 # bethela
 
-![ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/build-test.yml/badge.svg)
+![Ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/build-test.yml/badge.svg)
 
-A simple terminal command line tool for symmetric encrpytion & decryption of any files
+A simple terminal command line tool for symmetric encryption & decryption of any files
 
-### install in linux
+### install in Linux
 
 <ul>
 
@@ -17,13 +17,13 @@ make install
 ```
 or
 ```
-git clone https://github.com/mrdcvlsc/bethela.git
+git clone --recurse-submodules https://github.com/mrdcvlsc/bethela
 cd bethela
 make
 make install
 ```
 
-***If your system supports AES-NI(most modern coputer does), use ```make aesni``` instead of just ```make```, this will significantly increase the performance by a very large amount***
+***If your system supports AES-NI(most modern computers does), use ```make aesni``` instead of just ```make```, this will significantly increase the performance by a very large amount***
   
 </ul>
 
@@ -51,13 +51,13 @@ As you can see you can pass 1 or more files to the program
 ```
 bethela --generate keyfilename keysize
 ```
-the **keysize** should be a positive number greater than 0
+The **keysize** should be a positive number greater than 0
 
 <br>
 
 ### encrypt/decrypt with replace
 
-adding '-replace' command when encrypting/decrypting will
+Adding '-replace' command when encrypting/decrypting will
 replace the old files with the encrypted/decrypted files.
 
 ```
@@ -67,7 +67,7 @@ bethela --decrypt-replace keyfile file1 file2 ... fileN
 
 <br>
 
-for more information about using AES and other info about the program use the command below to show the help menu
+For more information about using AES and other info about the program use the command below to show the help menu
 
 ```
 bethela --help
