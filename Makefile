@@ -75,68 +75,49 @@ endif
 # TEST SCRIPTS
 
 test:
-	$(shell mkdir -p cryptos/Krypt/bin)
+	git submodule update --init --recursive
 	@echo "-----------------------------------------------------------"
-	@echo "==============  Krypt : compiling TEST  ==================="
+	@echo "================= COMPILING EXECUTABLE ===================="
 	@echo "-----------------------------------------------------------"
-	@$(MAKE) -C cryptos/Krypt compile_test
-	@echo "-----------------------------------------------------------"
-	@echo "===============  Krypt : running TEST  ===================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE) -C cryptos/Krypt run_test
-	@echo "Krypt tests done!!!"
-	@echo "..."
-	@echo "..."
-	@echo "entered bethela test..."
-	@make
+	@$(MAKE)
 	@echo "-----------------------------------------------------------"
 	@echo "====================   GENERATE KEYS   ===================="
 	@echo "-----------------------------------------------------------"
-	@make genkeys
+	@$(MAKE) genkeys
 	@echo "-----------------------------------------------------------"
 	@echo "=================   GENERATE TEST FILES   ================="
 	@echo "-----------------------------------------------------------"
-	@make randfile
+	@$(MAKE) randfile
 
 	@echo "-----------------------------------------------------------"
 	@echo "===============   COMPILING AES-NI AES   ================="
 	@echo "-----------------------------------------------------------"
-	@make aesni_debug
+	@$(MAKE) aesni_debug
 	@echo "-----------------------------------------------------------"
 	@echo "===============   TESTING AES-NI AES   ===================="
 	@echo "-----------------------------------------------------------"
 	@./bethela --version
-	@make aestest	
+	@$(MAKE) aestest	
 	
 	@echo "-----------------------------------------------------------"
 	@echo "===============   COMPLING PORTABLE AES  =================="
 	@echo "-----------------------------------------------------------"
-	@make debug_linux
+	@$(MAKE) debug_linux
 	@echo "-----------------------------------------------------------"
 	@echo "===============   TESTING PORTABLE AES  ==================="
 	@echo "-----------------------------------------------------------"
 	@./bethela --version
-	@make aestest
-# @echo "-----------------------------------------------------------"
-# @echo "===============   COMPILING CRYPTOPP AES  ================="
-# @echo "-----------------------------------------------------------"
-# @make cryptopp
-# @echo "-----------------------------------------------------------"
-# @echo "===============   TESTING CRYPTOPP AES  ==================="
-# @echo "-----------------------------------------------------------"
-# @./bethela --version
-# @make aestest
-
+	@$(MAKE) aestest
 	@echo "-----------------------------------------------------------"
 	@echo "=================   TESTING VIGENERE   ===================="
 	@echo "-----------------------------------------------------------"
-	@make vigtest
+	@$(MAKE) vigtest
 	@echo "-----------------------------------------------------------"
 	@echo "=================   CLEANING TEST FILES   ================="
 	@echo "-----------------------------------------------------------"
-	@make clean
+	@$(MAKE) clean
 	@echo "-----------------------------------------------------------"
-	@echo "=================   ALL TEST SUCXXESS!!!   ================="
+	@echo "=================   ALL TEST SUCCESS!!!   ================="
 	@echo "-----------------------------------------------------------"
 
 install_cryptoppp:
@@ -147,11 +128,11 @@ install_cryptoppp:
 
 aestest:
 	@echo "Validating generated test files first..."
-	@make checkfile
+	@$(MAKE) checkfile
 	@./bethela --enc-AES256-replace tests/AES256.key tests/*.subject
 	@./bethela --dec-AES256-replace tests/AES256.key tests/*.bthl
 	@echo "Checking Output Files For Real..."
-	@make checkfile
+	@$(MAKE) checkfile
 
 randfile:
 	@echo "compiling random file generator"
@@ -176,9 +157,10 @@ vigtest:
 	@echo "encrypting test files..."
 	@./bethela --encrypt-replace tests/testkeyVignere1000.key tests/*.subject
 	@./bethela --decrypt-replace tests/testkeyVignere1000.key tests/*.bthl
-	@make checkfile
+	@$(MAKE) checkfile
 
 clean:
 	@rm tests/*.key
 	@rm tests/*.subject
 	@rm tests/*.validator
+	@rm tests/*.bthl

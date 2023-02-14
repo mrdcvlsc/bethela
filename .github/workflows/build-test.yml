@@ -34,8 +34,5 @@ jobs:
     - name: build and run tests for GCC
       run: make test
 
-    - name: clean GCC compilation output
-      run: make clean
-
     - name: build and run tests for clang
       run: make test CXX=clang++

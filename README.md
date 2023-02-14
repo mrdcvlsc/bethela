@@ -18,6 +18,7 @@ make install
 or
 ```
 git clone --recurse-submodules https://github.com/mrdcvlsc/bethela
+git submodule update --init --recursive
 cd bethela
 make
 make install
