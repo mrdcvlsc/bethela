@@ -1,0 +1,3 @@
+[submodule "cryptos/Krypt"]
+	path = cryptos/Krypt
+	url = https://github.com/mrdcvlsc/Krypt
