@@ -1,0 +1,9 @@
+bethela
+
+tests/*.key
+tests/*.subject
+tests/*.validator
+tests/*.bthl
+
+tests/RandFile
+tests/FileCompare
