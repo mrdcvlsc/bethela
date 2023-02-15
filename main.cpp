@@ -13,7 +13,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/Krypt/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 3.5.5"
+#define BETHELA_VERSION "version 3.5.6"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -399,8 +399,17 @@ int main(int argc, char* args[])
         }
         else if(!strcmp(args[COMMAND],VERSION_FLAG))
         {
+            std::string compiler;
+#if defined(__clang__)
+            compiler = "clang++";
+#elif defined(__GNUC__) || defined(__GNUG__)
+            compiler = "g++";
+#elif defined(_MSC_VER)
+            compiler = "MSC";
+#endif
             int executable_bit = sizeof(size_t)==SIZE_T_32BIT ? 32 : 64;
-            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << " [" << CRYPTOLIB << "]\n";
+            std::cout << "bethela " << executable_bit << "-bit : " << BETHELA_VERSION << " [" << CRYPTOLIB << "]\n"
+            << "      compiler : " << compiler << "\n\n";
         }
         else
         {
