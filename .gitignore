@@ -7,3 +7,5 @@ tests/*.bthl
 
 tests/RandFile
 tests/FileCompare
+
+.vscode

@@ -13,7 +13,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/Krypt/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 3.5.6"
+#define BETHELA_VERSION "version 3.5.7"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
