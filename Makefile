@@ -17,20 +17,20 @@ endif
 all:
 	@echo "compiling portable version..."
 ifeq ($(OS), Linux)
-	$(CXX) -static-libgcc -static-libstdc++ $(THREADING) -DRELEASE main.cpp -O3 -march=native -o ${EXECUTABLE}
+	$(CXX) $(THREADING) -DRELEASE main.cpp -O3 -march=native -o ${EXECUTABLE}
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CXX) -static-libgcc -static-libstdc++ -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
+	@$(CXX) -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
 aesni:
 	@echo "compiling with AES-NI support"
 ifeq ($(OS), Linux)
-	$(CXX) -static-libgcc -static-libstdc++ $(THREADING) -DRELEASE main.cpp -DUSE_AESNI -maes -O3 -march=native -o ${EXECUTABLE}
+	$(CXX) $(THREADING) -DRELEASE main.cpp -DUSE_AESNI -maes -O3 -march=native -o ${EXECUTABLE}
 else
 	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	$(CXX) -static-libgcc -static-libstdc++ main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+	$(CXX) main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
 endif
 	@echo "compilation done."
 
@@ -46,11 +46,11 @@ endif
 
 # cryptopp:
 # 	@echo "compiliing executable with cryptopp"
-# 	@$(CXX) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp $(THREADING) -O3 -march=native
+# 	@$(CXX) -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp $(THREADING) -O3 -march=native
 
 # cryptopp_debug:
 # 	@echo "compiliing executable with cryptopp"
-# 	@$(CXX) -static-libgcc -static-libstdc++ -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address $(THREADING) -O0 -Wall -Wextra
+# 	@$(CXX) -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address $(THREADING) -O0 -Wall -Wextra
 
 debug_linux:
 	@echo "compiling with warnings and fsanitize"

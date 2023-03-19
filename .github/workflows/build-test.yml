@@ -7,32 +7,47 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  clang-ubuntu:
 
     runs-on: ubuntu-latest
-
+    
     steps:
+    - uses: actions/checkout@v3
 
     - name: install libomp for clang
       run: sudo apt-get install libomp-dev
-      
-    - name: install cmake
-      run: sudo apt-get install cmake
 
-    - name: install google-benchmark
-      run: sudo apt-get install libbenchmark-dev
+    - name: build and run tests for clang
+      run: make test CXX=clang++
 
-    - name: install google-test
-      run: sudo apt-get install libgtest-dev
+  clang-macos:
+
+    runs-on: macos-latest
     
-#     Dropped Support Currently (will bring back in the future | maybe)
-#     - name: install crypto++
-#       run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
-      
-    - uses: actions/checkout@v2
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: install llvm
+      run: brew install llvm
+
+    - name: install libomp for clang
+      run: brew install libomp
+
+    - name: build and run tests for clang
+      run: make test CXX=clang++
+
+  clang-windows:
+
+    runs-on: windows-2019
     
-    - name: build and run tests for GCC
-      run: make test
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: install llvm
+      run: brew install llvm
+
+    - name: install libomp for clang
+      run: brew install libomp
 
     - name: build and run tests for clang
       run: make test CXX=clang++
