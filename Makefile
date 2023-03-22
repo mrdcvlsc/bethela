@@ -7,55 +7,55 @@ INSTALLPATH=/usr/local/bin
 OS := $(shell uname)
 
 CXX:=g++
+CXX_STANDARD=-std=c++14
 
 ifeq ($(CXX), clang++)
-THREADING=-fopenmp
+THREADING=
 else
-THREADING=-fopenmp
+THREADING=
 endif
 
-all:
-	@echo "compiling portable version..."
-ifeq ($(OS), Linux)
-	$(CXX) $(THREADING) -DRELEASE main.cpp -O3 -march=native -o ${EXECUTABLE}
+TYPE=release
+VERSION=portable
+
+ifeq ($(CXX), clang++)
+ADDRESS_SANITIZER=-fsanitize=address
+THREADS_SANITIZER=-fsanitize=thread
 else
-	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	@$(CXX) -DRELEASE main.cpp -o ${EXECUTABLE}.exe -O3
+ADDRESS_SANITIZER=
+THREADS_SANITIZER=
 endif
-	@echo "compilation done."
 
-aesni:
-	@echo "compiling with AES-NI support"
-ifeq ($(OS), Linux)
-	$(CXX) $(THREADING) -DRELEASE main.cpp -DUSE_AESNI -maes -O3 -march=native -o ${EXECUTABLE}
-else
-	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	$(CXX) main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O3
+ifeq ($(TYPE), release)
+CXX_FLAGS=-O3
+else ifeq ($(TYPE), debug)
+CXX_FLAGS=-g -Wall -Wextra $(ADDRESS_SANITIZER)
+else ifeq ($(TYPE), debug_threads)
+CXX_FLAGS=-g -Wall -Wextra $(THREADS_SANITIZER)
 endif
-	@echo "compilation done."
 
-aesni_debug:
-	@echo "compiling with AES-NI-debug support"
-ifeq ($(OS), Linux)
-	$(CXX) -g -DRELEASE main.cpp -DUSE_AESNI -maes -Og -march=native -o ${EXECUTABLE} -fsanitize=address
-else
-	@echo "for windows the build is not multi-threaded, you need to set it up on your own for now"
-	$(CXX) -g main.cpp -DRELEASE -DUSE_AESNI -maes -o ${EXECUTABLE}.exe -O0 -fsanitize=address
+ifeq ($(VERSION), portable)
+COMPILATION_MSG="compiling portable version"
+VERSION_FLAGS=
+else ifeq ($(VERSION), aesni)
+COMPILATION_MSG="compiling AES-NI version"
+VERSION_FLAGS=-DUSE_AESNI -maes
 endif
-	@echo "compilation done."
 
-# cryptopp:
-# 	@echo "compiliing executable with cryptopp"
-# 	@$(CXX) -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -lcryptopp $(THREADING) -O3 -march=native
+.PHONY: default environment compile install uninstall encrypt_decrypt randfile checkfile genkeys vig_encrypt_decrypt clean
 
-# cryptopp_debug:
-# 	@echo "compiliing executable with cryptopp"
-# 	@$(CXX) -DUSE_CRYPTOPP -DRELEASE main.cpp -o ${EXECUTABLE} -g -lcryptopp -fsanitize=address $(THREADING) -O0 -Wall -Wextra
+default:
+	@echo "makefile variables and possible values"
+	@echo "CXX     : g++, clang++"
+	@echo "TYPE    : release, debug, debug_threads"
+	@echo "VERSION : portable, aesni"
 
-debug_linux:
-	@echo "compiling with warnings and fsanitize"
-	$(CXX) -g main.cpp -o ${EXECUTABLE} -Wall -Wextra -Og -fsanitize=address
-	@echo "compiling done"
+environment:
+	@echo "OS : $(OS)"
+
+compile:
+	@echo $(COMPILATION_MSG)
+	$(CXX) $(CXX_STANDARD) main.cpp -o ${EXECUTABLE} $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
 
 install:
 ifeq ($(OS), Linux)
@@ -72,91 +72,38 @@ else
 	@rm ./${EXECUTABLE}.exe
 endif
 
-# TEST SCRIPTS
-
-test:
-	git submodule update --init --recursive
-	@echo "-----------------------------------------------------------"
-	@echo "================= COMPILING EXECUTABLE ===================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE)
-	@echo "-----------------------------------------------------------"
-	@echo "====================   GENERATE KEYS   ===================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE) genkeys
-	@echo "-----------------------------------------------------------"
-	@echo "=================   GENERATE TEST FILES   ================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE) randfile
-
-	@echo "-----------------------------------------------------------"
-	@echo "===============   COMPILING AES-NI AES   ================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE) aesni_debug
-	@echo "-----------------------------------------------------------"
-	@echo "===============   TESTING AES-NI AES   ===================="
-	@echo "-----------------------------------------------------------"
+encrypt_decrypt:
+	@echo "Encrypting/Decrypting test files with:"
 	@./bethela --version
-	@$(MAKE) aestest	
-	
-	@echo "-----------------------------------------------------------"
-	@echo "===============   COMPLING PORTABLE AES  =================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE) debug_linux
-	@echo "-----------------------------------------------------------"
-	@echo "===============   TESTING PORTABLE AES  ==================="
-	@echo "-----------------------------------------------------------"
-	@./bethela --version
-	@$(MAKE) aestest
-	@echo "-----------------------------------------------------------"
-	@echo "=================   TESTING VIGENERE   ===================="
-	@echo "-----------------------------------------------------------"
-	@$(MAKE) vigtest
-	@echo "-----------------------------------------------------------"
-	@echo "=================   ALL TEST SUCCESS!!!   ================="
-	@echo "-----------------------------------------------------------"
-
-install_cryptoppp:
-	@echo "-----------------------------------------------------------"
-	@echo "=================   INSTALL CRYPTOPP   ===================="
-	@echo "-----------------------------------------------------------"
-	@sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
-
-aestest:
-	@echo "Validating generated test files first..."
-	@$(MAKE) checkfile
-	@./bethela --enc-AES256-replace tests/AES256.key tests/*.subject
-	@./bethela --dec-AES256-replace tests/AES256.key tests/*.bthl
-	@echo "Checking Output Files For Real..."
-	@$(MAKE) checkfile
+	@./bethela --enc-AES256-replace AES256.key file0.subject file1.subject file2.subject file3.subject file4.subject file5.subject file6.subject file7.subject file8.subject
+	@./bethela --dec-AES256-replace AES256.key file0.subject.bthl file1.subject.bthl file2.subject.bthl file3.subject.bthl file4.subject.bthl file5.subject.bthl file6.subject.bthl file7.subject.bthl file8.subject.bthl
 
 randfile:
 	@echo "compiling random file generator"
-	@$(CXX) tests/RandFile.cpp -o tests/RandFile -O3
+	$(CXX) $(CXX_STANDARD) tests/RandFile.cpp -o RandFile -O3
 	@echo "generating random files..."
-	@cd tests && ./RandFile
+	@./RandFile
 
 checkfile:
 	@echo "compiling equality file checker"
-	@$(CXX) tests/FileCompare.cpp -o tests/FileCompare -O3
+	$(CXX) $(CXX_STANDARD) tests/FileCompare.cpp -o FileCompare -O3
 	@echo "checking random files equality..."
-	@cd tests && ./FileCompare
+	@./FileCompare
 
 genkeys:
 	@echo "generate keys"
-	@./bethela --generate tests/testkeyVignere1000.key 1000
-	@./bethela --generate tests/AES128.key 16
-	@./bethela --generate tests/AES192.key 24
-	@./bethela --generate tests/AES256.key 32
+	@./bethela --generate testkeyVignere1000.key 1000
+	@./bethela --generate AES128.key 16
+	@./bethela --generate AES192.key 24
+	@./bethela --generate AES256.key 32
 
-vigtest:
+vig_encrypt_decrypt:
 	@echo "encrypting test files..."
-	@./bethela --encrypt-replace tests/testkeyVignere1000.key tests/*.subject
-	@./bethela --decrypt-replace tests/testkeyVignere1000.key tests/*.bthl
-	@$(MAKE) checkfile
+	@./bethela --encrypt-replace testkeyVignere1000.key *.subject
+	@./bethela --decrypt-replace testkeyVignere1000.key *.bthl
 
 clean:
-	@rm tests/*.key
-	@rm tests/*.subject
-	@rm tests/*.validator
-	@rm tests/*.bthl
+	@rm *.key
+	@rm *.subject
+	@rm *.validator
+	@rm *.bthl

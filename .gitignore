@@ -1,11 +1,13 @@
 bethela
 
-tests/*.key
-tests/*.subject
-tests/*.validator
-tests/*.bthl
+*.key
+*.subject
+*.validator
+*.bthl
 
 tests/RandFile
 tests/FileCompare
+RandFile
+FileCompare
 
 .vscode

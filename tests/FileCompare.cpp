@@ -10,7 +10,19 @@ bool ISEQUAL(const std::string& FileA, const std::string& FileB)
     bconst::bytestream A = byteio::file_read(FileA);
     bconst::bytestream B = byteio::file_read(FileB);
 
-    return A == B;
+    if (A.size() != B.size()) {
+        return false;
+    } else if (A.size() <= 0 || B.size() <= 0) {
+        return false;
+    } else {
+        for (size_t i = 0; i < A.size(); ++i) {
+            if (A[i] != B[i]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 int main()
@@ -23,7 +35,7 @@ int main()
     for(size_t i=0; i<TOTAL_TEST; ++i)
     {
         RandFilenameTemplate[NUMBER_INDEX] = RandVFilenameTemplate[NUMBER_INDEX] = ('0'+(char)i);
-        bool eq = ISEQUAL(RandFilenameTemplate,RandVFilenameTemplate);
+        bool eq = ISEQUAL(RandFilenameTemplate, RandVFilenameTemplate);
         if(eq)
             std::cout << "\t\ttest " << i << " - success\n";
         else
