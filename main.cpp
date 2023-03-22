@@ -2,6 +2,7 @@
 #include <cstring>
 #include <chrono>
 #include <thread>
+#include <atomic>
 
 #if defined(USE_AESNI)
 #define CRYPTOLIB "AES-NI"
@@ -36,7 +37,8 @@
 #define KEY 2
 #define STARTING_FILE 3
 
-#define BUFFER_BYTESIZE 134217728
+/// 192 MB.
+#define BUFFER_BYTESIZE 201326592
 
 #define TIMING_START std::cout << "program running, please wait...\n"; \
 auto start = std::chrono::high_resolution_clock::now()
@@ -196,7 +198,7 @@ int main(int argc, char* args[])
             Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
-            size_t cnt = 0;
+            std::atomic<size_t> cnt(0);
 
             std::cout << "Encryption : AES block cipher \n";
 
@@ -295,7 +297,7 @@ int main(int argc, char* args[])
             Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
 
             TIMING_START;
-            size_t cnt = 0;
+            std::atomic<size_t> cnt(0);
 
             std::cout << "Decryption : AES block cipher \n";
 
