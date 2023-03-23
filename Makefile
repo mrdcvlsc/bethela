@@ -55,21 +55,21 @@ environment:
 
 compile:
 	@echo $(COMPILATION_MSG)
-	$(CXX) $(CXX_STANDARD) main.cpp -o ${EXECUTABLE} $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
+	$(CXX) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
 
 install:
 ifeq ($(OS), Linux)
-	@echo "created a symlink in ${INSTALLPATH}"
-	@ln -s $(dir $(abspath $(lastword $(MAKEFILE_LIST))))${EXECUTABLE} ${INSTALLPATH}
+	@echo "created a symlink in $(INSTALLPATH)"
+	@ln -s $(dir $(abspath $(lastword $(MAKEFILE_LIST))))$(EXECUTABLE) $(INSTALLPATH)
 else
 	@echo "Set It Manually for now"
 endif
 
 uninstall:
 ifeq ($(OS), Linux)
-	@rm ${INSTALLPATH}/${EXECUTABLE}
+	@rm $(INSTALLPATH)/$(EXECUTABLE)
 else
-	@rm ./${EXECUTABLE}.exe
+	@rm ./$(EXECUTABLE)
 endif
 
 encrypt_decrypt:
