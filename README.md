@@ -2,6 +2,8 @@
 
 ![Ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/build-test.yml/badge.svg)
 
+## **Compiles with C++14**
+
 A simple terminal command line tool for symmetric encryption & decryption of any files
 
 ## **install in Linux**
@@ -52,8 +54,6 @@ make install
 make uninstall
 ```
 
-***If your system supports AES-NI(most modern computers does), use ```make aesni``` instead of just ```make```, this will significantly increase the performance by a very large amount***
-  
 </ul>
 
 ----------------------------------------------------

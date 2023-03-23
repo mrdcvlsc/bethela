@@ -204,16 +204,16 @@ int main(int argc, char* args[])
 
             auto encrypt_lambda = [&](size_t i) {
                 char* tbuffer = new char[BUFFER_BYTESIZE];
-                std::string infname(args[i]), outfname(args[i]+bconst::extension);
-                std::ifstream curr_file(infname,std::ios::binary);
+                std::string infname(args[i]), outfname(infname + bconst::extension);
+                std::ifstream curr_file(infname, std::ios::binary);
 
                 if (!curr_file.good()) {
                     std::cout << 
-                        "The file : " << args[i] << "\n"
+                        "The file : " << infname << "\n"
                         "was not encrypted...\n"
                         "it might be read protected, corrupted or non-existent...\n";
                 } else {
-                    std::cout << "encrypting : " << args[i] << "...\n";
+                    std::cout << "encrypting : " << infname << "...\n";
                     
                     Krypt::Bytes* iv = keygen::random_bytestream_array(AES_BLOCKSIZE);
 
@@ -224,10 +224,10 @@ int main(int argc, char* args[])
                     output_file.write(reinterpret_cast<const char*>(iv),AES_BLOCKSIZE);
 
                     while (!curr_file.eof()) {
-                        curr_file.read(tbuffer,BUFFER_BYTESIZE);
+                        curr_file.read(tbuffer, BUFFER_BYTESIZE);
                         size_t read_buffer_size = curr_file.gcount();
 
-                        if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
+                        if(!curr_file.eof() && read_buffer_size == BUFFER_BYTESIZE)
                         {
                             Krypt::ByteArray cipher = blocksNoPadding.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                             output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
@@ -235,7 +235,10 @@ int main(int argc, char* args[])
                         }
                         else if(curr_file.eof())
                         {
-                            if(!read_buffer_size) continue;
+                            if(!read_buffer_size) {
+                                continue;
+                            }
+
                             Krypt::ByteArray cipher = lastBlockKrypt.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                             output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
                         }
@@ -251,7 +254,7 @@ int main(int argc, char* args[])
                     memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
 
                     delete [] iv;
-                    CHECKIF_REPLACE(args[COMMAND],args[i]);
+                    CHECKIF_REPLACE(args[COMMAND], infname);
                 }
                 delete [] tbuffer;
             };
@@ -262,11 +265,13 @@ int main(int argc, char* args[])
                 std::cout << "------ set ------ \n";
                 std::vector<std::thread> threads;
 
-                for (size_t i = 0; i < processor_count; ++i) {
+                for (size_t i = 0; i < processor_count - 1; ++i) {
                     threads.push_back(std::thread(encrypt_lambda, file_tracker++));
                 }
 
-                for (size_t i = 0; i < processor_count; ++i) {
+                encrypt_lambda(file_tracker++);
+
+                for (size_t i = 0; i < processor_count - 1; ++i) {
                     threads[i].join();
                 }
 
@@ -304,24 +309,25 @@ int main(int argc, char* args[])
             auto decrypt_lambda = [&](size_t i) {
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 char* filesig = new char[bconst::FILESIGNATURE.size()];
+
                 std::string infname(args[i]), outfname(args[i]);
                 outfname = outfname.substr(0,outfname.size()-bconst::extension.size());
 
-                std::ifstream curr_file(infname,std::ios::binary);
+                std::ifstream curr_file(infname, std::ios::binary);
 
                 if (!curr_file.good()) {
                     std::cout << 
-                        "The file : " << args[i] << "\n"
+                        "The file : " << infname << "\n"
                         "was not decrypted...\n"
                         "it might be read protected, corrupted or non-existent...\n";
                 } else {
-                    std::cout << "decrypting : " << args[i] << "...\n";
+                    std::cout << "decrypting : " << infname << "...\n";
 
                     curr_file.read(filesig,bconst::FILESIGNATURE.size());
 
                     if(memcmp(filesig,bconst::FILESIGNATURE.data(),bconst::FILESIGNATURE.size()))
                     {
-                        std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
+                        std::cerr << "The file '" << infname << "' is not encrypted, no need to decrypt it!\n";
                     }
                     else
                     {
@@ -343,9 +349,12 @@ int main(int argc, char* args[])
                                 output_file.write(reinterpret_cast<char*>(recover.array),recover.length);
                                 memcpy(iv,tbuffer+(BUFFER_BYTESIZE-AES_BLOCKSIZE),AES_BLOCKSIZE);
                             }
-                            else if(curr_file.eof())
-                            {
-                                if(!read_buffer_size) continue;
+                            else if (curr_file.eof()) {
+
+                                if(!read_buffer_size) {
+                                    continue;
+                                }
+
                                 Krypt::ByteArray recover = lastBlockKrypt.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
                                 output_file.write(reinterpret_cast<char*>(recover.array),recover.length);  
                             }
@@ -360,7 +369,7 @@ int main(int argc, char* args[])
                         delete [] iv;
                         
                         cnt++;
-                        CHECKIF_REPLACE(args[COMMAND],args[i]);
+                        CHECKIF_REPLACE(args[COMMAND], infname);
                     }
 
                     memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
@@ -378,11 +387,13 @@ int main(int argc, char* args[])
                 std::cout << "------ set ------ \n";
                 std::vector<std::thread> threads;
 
-                for (size_t i = 0; i < processor_count; ++i) {
+                for (size_t i = 0; i < processor_count - 1; ++i) {
                     threads.push_back(std::thread(decrypt_lambda, file_tracker++));
                 }
 
-                for (size_t i = 0; i < processor_count; ++i) {
+                decrypt_lambda(file_tracker++);
+
+                for (size_t i = 0; i < processor_count - 1; ++i) {
                     threads[i].join();
                 }
 

@@ -107,3 +107,30 @@ clean:
 	@rm *.subject
 	@rm *.validator
 	@rm *.bthl
+	@rm FileCompare
+	@rm RandFile
+
+temp-linux-test-flow:
+
+	@$(MAKE) compile CXX=clang++ TYPE=debug VERSION=portable
+	@$(MAKE) genkeys CXX=clang++
+	@$(MAKE) randfile CXX=clang++
+	@$(MAKE) encrypt_decrypt
+	@$(MAKE) checkfile CXX=clang++
+	@$(MAKE) vig_encrypt_decrypt
+	@./FileCompare
+	@$(MAKE) compile CXX=clang++ TYPE=debug_threads VERSION=portable
+	@$(MAKE) encrypt_decrypt
+	@./FileCompare
+	@$(MAKE) vig_encrypt_decrypt
+	@./FileCompare
+	@$(MAKE) compile CXX=clang++ TYPE=debug VERSION=aesni
+	@$(MAKE) encrypt_decrypt
+	@./FileCompare
+	@$(MAKE) vig_encrypt_decrypt
+	@./FileCompare
+	@$(MAKE) compile CXX=clang++ TYPE=debug_threads VERSION=aesni
+	@$(MAKE) encrypt_decrypt
+	@./FileCompare
+	@$(MAKE) vig_encrypt_decrypt
+	@./FileCompare
