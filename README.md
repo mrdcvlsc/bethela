@@ -4,24 +4,52 @@
 
 A simple terminal command line tool for symmetric encryption & decryption of any files
 
-### install in Linux
+## **install in Linux**
 
 <ul>
 
-```
-wget https://github.com/mrdcvlsc/bethela/archive/refs/tags/v3.5.4.tar.gz
-tar -xf v3.5.4..tar.gz
-cd bethela-3.5.4
-make
-make install
-```
-or
+**Clone and open the repo**
+
 ```
 git clone --recurse-submodules https://github.com/mrdcvlsc/bethela
 git submodule update --init --recursive
 cd bethela
-make
+```
+
+**Compile with clang and aesni instructions**
+
+```
+make compile CXX=clang++ VERSION=aesni TYPE=release
+```
+
+**Compile with clang and pure C++ implementation**
+
+```
+make compile CXX=clang++ VERSION=portable TYPE=release
+```
+
+**Compile with gcc and aesni instructions**
+
+```
+make compile CXX=g++ VERSION=aesni TYPE=release
+```
+
+**Compile with gcc and pure C++ implementation**
+
+```
+make compile CXX=g++ VERSION=portable TYPE=release
+```
+
+**Install the program to usr/local/bin (for linux)**
+
+```
 make install
+```
+
+**Uninstall the program to usr/local/bin (for linux)**
+
+```
+make uninstall
 ```
 
 ***If your system supports AES-NI(most modern computers does), use ```make aesni``` instead of just ```make```, this will significantly increase the performance by a very large amount***
@@ -72,12 +100,4 @@ For more information about using AES and other info about the program use the co
 
 ```
 bethela --help
-```
-
-### Compiling with clang++
-
-You might need to install `libomp-dev` first when using clang
-
-```
-sudo apt-get install libomp-dev
 ```
