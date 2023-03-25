@@ -14,7 +14,7 @@
 #include "cryptos/vigenere.hpp"
 #include "cryptos/Krypt/src/Krypt.hpp"
 
-#define BETHELA_VERSION "version 3.5.7"
+#define BETHELA_VERSION "version 3.5.8"
 #define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
@@ -204,6 +204,8 @@ int main(int argc, char* args[])
 
             auto encrypt_lambda = [&](size_t i) {
                 char* tbuffer = new char[BUFFER_BYTESIZE];
+                Krypt::Bytes *encryptedBuffer = new Krypt::Bytes[BUFFER_BYTESIZE];
+
                 std::string infname(args[i]), outfname(infname + bconst::extension);
                 std::ifstream curr_file(infname, std::ios::binary);
 
@@ -231,21 +233,30 @@ int main(int argc, char* args[])
 
                         if(!curr_file.eof() && read_buffer_size == BUFFER_BYTESIZE) {
                             for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
-                                lastBlockKrypt.blockEncrypt(reinterpret_cast<unsigned char*>(tbuffer + index), encryptedBlock, iv);
-                                output_file.write(reinterpret_cast<char*>(encryptedBlock), AES_BLOCKSIZE);
+                                lastBlockKrypt.blockEncrypt(
+                                    reinterpret_cast<unsigned char*>(tbuffer + index),
+                                    reinterpret_cast<unsigned char*>(encryptedBuffer + index),
+                                    iv
+                                );
                             }
+                            output_file.write(reinterpret_cast<char*>(encryptedBuffer), read_buffer_size);
                         }
                         else if(curr_file.eof()) {
                             if(read_buffer_size) {
 
                                 size_t remaining_blocks = read_buffer_size / AES_BLOCKSIZE;
-                                size_t index;
-                                for (index = 0; index < remaining_blocks; ++index) {
-                                    lastBlockKrypt.blockEncrypt(reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)), encryptedBlock, iv);
-                                    output_file.write(reinterpret_cast<char*>(encryptedBlock), AES_BLOCKSIZE);
-                                }
-
                                 size_t remaining_bytes = read_buffer_size % AES_BLOCKSIZE;
+                                size_t index;
+
+                                for (index = 0; index < remaining_blocks; ++index) {
+                                    lastBlockKrypt.blockEncrypt(
+                                        reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)),
+                                        reinterpret_cast<unsigned char*>(encryptedBuffer + (index * AES_BLOCKSIZE)),
+                                        iv
+                                    );
+                                }
+                                output_file.write(reinterpret_cast<char*>(encryptedBuffer), remaining_blocks * AES_BLOCKSIZE);
+
                                 Krypt::ByteArray cipher = lastBlockKrypt.encrypt(
                                     reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)),
                                     remaining_bytes,
@@ -254,19 +265,30 @@ int main(int argc, char* args[])
                                 output_file.write(reinterpret_cast<char*>(cipher.array), cipher.length);                            
                             }
                         } else {
+                            memset((unsigned char*) iv, 0x00, AES_BLOCKSIZE);
+                            memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
+                            memset((Krypt::Bytes*) encryptedBuffer, 0x00, BUFFER_BYTESIZE);
+                            
                             delete [] iv;
+                            delete [] tbuffer;
+                            delete [] encryptedBuffer;
+
                             throw std::logic_error("enc: something wrong happend");
                         }
                     }
                     cnt++;
 
                     memset((unsigned char*) iv, 0x00, AES_BLOCKSIZE);
-                    memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
-
                     delete [] iv;
+
                     CHECKIF_REPLACE(args[COMMAND], infname);
                 }
+
+                memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
+                memset((Krypt::Bytes*) encryptedBuffer, 0x00, BUFFER_BYTESIZE);
+
                 delete [] tbuffer;
+                delete [] encryptedBuffer;
             };
             // #pragma omp parallel for num_threads(omp_get_max_threads())
 
@@ -319,6 +341,7 @@ int main(int argc, char* args[])
             auto decrypt_lambda = [&](size_t i) {
                 char* tbuffer = new char[BUFFER_BYTESIZE];
                 char* filesig = new char[bconst::FILESIGNATURE.size()];
+                Krypt::Bytes *decryptedBuffer = new Krypt::Bytes[BUFFER_BYTESIZE];
 
                 std::string infname(args[i]), outfname(args[i]);
                 outfname = outfname.substr(0,outfname.size()-bconst::extension.size());
@@ -358,9 +381,13 @@ int main(int argc, char* args[])
                             if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
                             {
                                 for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
-                                    lastBlockKrypt.blockDecrypt(reinterpret_cast<unsigned char*>(tbuffer + index), decryptedBlock, iv);
-                                    output_file.write(reinterpret_cast<char*>(decryptedBlock), AES_BLOCKSIZE);
+                                    lastBlockKrypt.blockDecrypt(
+                                        reinterpret_cast<unsigned char*>(tbuffer + index),
+                                        reinterpret_cast<unsigned char*>(decryptedBuffer + index),
+                                        iv
+                                    );
                                 }
+                                output_file.write(reinterpret_cast<char*>(decryptedBuffer), read_buffer_size);
                             }
                             else if (curr_file.eof()) {
 
@@ -369,9 +396,13 @@ int main(int argc, char* args[])
                                     size_t index;
 
                                     for (index = 0; index < remaining_blocks - 1; ++index) {
-                                        lastBlockKrypt.blockDecrypt(reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)), decryptedBlock, iv);
-                                        output_file.write(reinterpret_cast<char*>(decryptedBlock), AES_BLOCKSIZE);
+                                        lastBlockKrypt.blockDecrypt(
+                                            reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)),
+                                            reinterpret_cast<unsigned char*>(decryptedBuffer + (index * AES_BLOCKSIZE)),
+                                            iv
+                                        );
                                     }
+                                    output_file.write(reinterpret_cast<char*>(decryptedBuffer), (remaining_blocks - 1) * AES_BLOCKSIZE);
 
                                     Krypt::ByteArray recover = lastBlockKrypt.decrypt(
                                         reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)),
@@ -383,7 +414,16 @@ int main(int argc, char* args[])
                             }
                             else
                             {
+                                memset((unsigned char*) iv, 0x00, AES_BLOCKSIZE);
+                                memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
+                                memset((char*) filesig, 0x00, bconst::FILESIGNATURE.size());
+                                memset((Krypt::Bytes*) decryptedBuffer, 0x00, BUFFER_BYTESIZE);
+                                
                                 delete [] iv;
+                                delete [] tbuffer;
+                                delete [] filesig;
+                                delete [] decryptedBuffer;
+
                                 throw std::logic_error("something wrong happen");
                             }
                         }
@@ -397,9 +437,11 @@ int main(int argc, char* args[])
 
                     memset((char*) tbuffer, 0x00, BUFFER_BYTESIZE);
                     memset((char*) filesig, 0x00, bconst::FILESIGNATURE.size());
+                    memset((Krypt::Bytes*) decryptedBuffer, 0x00, BUFFER_BYTESIZE);
 
                     delete [] tbuffer;
                     delete [] filesig;
+                    delete [] decryptedBuffer;
                 }
             };
 

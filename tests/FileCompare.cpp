@@ -2,7 +2,7 @@
 #include "../constants.hpp"
 #include "../byteio.hpp"
 
-#define TOTAL_TEST 9
+#define TOTAL_TEST 10
 #define NUMBER_INDEX 4
 
 bool ISEQUAL(const std::string& FileA, const std::string& FileB)
@@ -25,6 +25,10 @@ bool ISEQUAL(const std::string& FileA, const std::string& FileB)
 
         float equality = ((float) A.size() - (float) not_equal) / (float) A.size();
         std::cout << "\n\t\tEqual by : " << equality * 100.0f << " percent\n";
+
+        if (not_equal) {
+            return false;
+        }
     }
 
     return true;

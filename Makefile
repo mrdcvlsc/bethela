@@ -86,8 +86,8 @@ endif
 encrypt_decrypt:
 	@echo "Encrypting/Decrypting test files with:"
 	@./bethela --version
-	@./bethela --enc-AES256-replace AES256.key file0.subject file1.subject file2.subject file3.subject file4.subject file5.subject file6.subject file7.subject file8.subject
-	@./bethela --dec-AES256-replace AES256.key file0.subject.bthl file1.subject.bthl file2.subject.bthl file3.subject.bthl file4.subject.bthl file5.subject.bthl file6.subject.bthl file7.subject.bthl file8.subject.bthl
+	@./bethela --enc-AES256-replace AES256.key file0.subject file1.subject file2.subject file3.subject file4.subject file5.subject file6.subject file7.subject file8.subject file9.subject
+	@./bethela --dec-AES256-replace AES256.key file0.subject.bthl file1.subject.bthl file2.subject.bthl file3.subject.bthl file4.subject.bthl file5.subject.bthl file6.subject.bthl file7.subject.bthl file8.subject.bthl file9.subject.bthl
 
 randfile:
 	@echo "compiling random file generator"

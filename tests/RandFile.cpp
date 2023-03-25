@@ -7,8 +7,10 @@
 #include "../constants.hpp"
 
 #define BYTE(N) N
-#define MB(N) N*1024*1024
 
+constexpr size_t MB(size_t N) {
+    return N * 1024 * 1024;
+}
 
 int main()
 {
@@ -65,11 +67,17 @@ int main()
         byteio::file_write("file7.subject",RandStream7);
         byteio::file_write("file7.validator",RandStream7);
 
-        //FILE8 - 256 mb
+        //FILE8 - 257 mb
         bconst::bytestream RandStream8;
-        for(size_t i=0; i<MB(255); ++i) RandStream8.push_back(random_number(rand_engine));
+        for(size_t i=0; i<MB(257); ++i) RandStream8.push_back(random_number(rand_engine));
         byteio::file_write("file8.subject",RandStream8);
         byteio::file_write("file8.validator",RandStream8);
+
+        //FILE8 - 777 mb
+        bconst::bytestream RandStream9;
+        for(size_t i=0; i<MB(777); ++i) RandStream9.push_back(random_number(rand_engine));
+        byteio::file_write("file9.subject",RandStream9);
+        byteio::file_write("file9.validator",RandStream9);
     } catch(const char* err) {
         throw err;
     }
