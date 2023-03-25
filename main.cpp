@@ -194,8 +194,8 @@ int main(int argc, char* args[])
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey,AES_KEY_SIZE);
 
-            Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(),loadKey.size());
-            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(),loadKey.size());
+            Mode::CBC<BlockCipher::AES,Padding::NoPadding> blocksNoPadding(loadKey.data(), loadKey.size());
+            Mode::CBC<BlockCipher::AES,Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(), loadKey.size());
 
             TIMING_START;
             std::atomic<size_t> cnt(0);
@@ -221,29 +221,39 @@ int main(int argc, char* args[])
                     output_file.write(reinterpret_cast<const char*>(bconst::FILESIGNATURE.data()),bconst::FILESIGNATURE.size());
                     output_file.close();
                     output_file.open(outfname,std::ios::binary | std::ios::app);
-                    output_file.write(reinterpret_cast<const char*>(iv),AES_BLOCKSIZE);
+                    output_file.write(reinterpret_cast<const char*>(iv), AES_BLOCKSIZE);
+
+                    Krypt::Bytes encryptedBlock[AES_BLOCKSIZE];
 
                     while (!curr_file.eof()) {
                         curr_file.read(tbuffer, BUFFER_BYTESIZE);
                         size_t read_buffer_size = curr_file.gcount();
 
-                        if(!curr_file.eof() && read_buffer_size == BUFFER_BYTESIZE)
-                        {
-                            Krypt::ByteArray cipher = blocksNoPadding.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
-                            output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
-                            memcpy(iv,cipher.array+(BUFFER_BYTESIZE-AES_BLOCKSIZE),AES_BLOCKSIZE);
-                        }
-                        else if(curr_file.eof())
-                        {
-                            if(!read_buffer_size) {
-                                continue;
+                        if(!curr_file.eof() && read_buffer_size == BUFFER_BYTESIZE) {
+                            for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
+                                lastBlockKrypt.blockEncrypt(reinterpret_cast<unsigned char*>(tbuffer + index), encryptedBlock, iv);
+                                output_file.write(reinterpret_cast<char*>(encryptedBlock), AES_BLOCKSIZE);
                             }
-
-                            Krypt::ByteArray cipher = lastBlockKrypt.encrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
-                            output_file.write(reinterpret_cast<char*>(cipher.array),cipher.length);
                         }
-                        else
-                        {
+                        else if(curr_file.eof()) {
+                            if(read_buffer_size) {
+
+                                size_t remaining_blocks = read_buffer_size / AES_BLOCKSIZE;
+                                size_t index;
+                                for (index = 0; index < remaining_blocks; ++index) {
+                                    lastBlockKrypt.blockEncrypt(reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)), encryptedBlock, iv);
+                                    output_file.write(reinterpret_cast<char*>(encryptedBlock), AES_BLOCKSIZE);
+                                }
+
+                                size_t remaining_bytes = read_buffer_size % AES_BLOCKSIZE;
+                                Krypt::ByteArray cipher = lastBlockKrypt.encrypt(
+                                    reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)),
+                                    remaining_bytes,
+                                    iv
+                                );
+                                output_file.write(reinterpret_cast<char*>(cipher.array), cipher.length);                            
+                            }
+                        } else {
                             delete [] iv;
                             throw std::logic_error("enc: something wrong happend");
                         }
@@ -338,6 +348,8 @@ int main(int argc, char* args[])
                         unsigned char* iv = new unsigned char[AES_BLOCKSIZE];
                         curr_file.read(reinterpret_cast<char*>(iv),AES_BLOCKSIZE);
 
+                        Krypt::Bytes decryptedBlock[AES_BLOCKSIZE];
+
                         while(!curr_file.eof())
                         {
                             curr_file.read(tbuffer,BUFFER_BYTESIZE);
@@ -345,18 +357,29 @@ int main(int argc, char* args[])
 
                             if(!curr_file.eof() && read_buffer_size==BUFFER_BYTESIZE)
                             {
-                                Krypt::ByteArray recover = blocksNoPadding.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
-                                output_file.write(reinterpret_cast<char*>(recover.array),recover.length);
-                                memcpy(iv,tbuffer+(BUFFER_BYTESIZE-AES_BLOCKSIZE),AES_BLOCKSIZE);
+                                for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
+                                    lastBlockKrypt.blockDecrypt(reinterpret_cast<unsigned char*>(tbuffer + index), decryptedBlock, iv);
+                                    output_file.write(reinterpret_cast<char*>(decryptedBlock), AES_BLOCKSIZE);
+                                }
                             }
                             else if (curr_file.eof()) {
 
-                                if(!read_buffer_size) {
-                                    continue;
-                                }
+                                if (read_buffer_size) {
+                                    size_t remaining_blocks = read_buffer_size / AES_BLOCKSIZE;
+                                    size_t index;
 
-                                Krypt::ByteArray recover = lastBlockKrypt.decrypt(reinterpret_cast<unsigned char*>(tbuffer),read_buffer_size,iv);
-                                output_file.write(reinterpret_cast<char*>(recover.array),recover.length);  
+                                    for (index = 0; index < remaining_blocks - 1; ++index) {
+                                        lastBlockKrypt.blockDecrypt(reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)), decryptedBlock, iv);
+                                        output_file.write(reinterpret_cast<char*>(decryptedBlock), AES_BLOCKSIZE);
+                                    }
+
+                                    Krypt::ByteArray recover = lastBlockKrypt.decrypt(
+                                        reinterpret_cast<unsigned char*>(tbuffer + (index * AES_BLOCKSIZE)),
+                                        AES_BLOCKSIZE, iv
+                                    );
+
+                                    output_file.write(reinterpret_cast<char*>(recover.array), recover.length);
+                                }
                             }
                             else
                             {

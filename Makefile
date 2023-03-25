@@ -17,6 +17,13 @@ endif
 
 TYPE=release
 VERSION=portable
+LINK=dynamic
+
+ifeq ($(LINK), dynamic)
+LINKER=
+else ifeq ($(LINK), static)
+LINKER=-static
+endif
 
 ifeq ($(CXX), clang++)
 ADDRESS_SANITIZER=-fsanitize=address
@@ -45,17 +52,21 @@ endif
 .PHONY: default environment compile install uninstall encrypt_decrypt randfile checkfile genkeys vig_encrypt_decrypt clean
 
 default:
-	@echo "makefile variables and possible values"
+	@echo "Makefile variables and possible values"
+	@echo "The the first element are always the default value"
 	@echo "CXX     : g++, clang++"
 	@echo "TYPE    : release, debug, debug_threads"
 	@echo "VERSION : portable, aesni"
+	@echo "LINK    : dynamic, static"
+	@echo ""
+	@echo "Makefile recipes"
 
 environment:
 	@echo "OS : $(OS)"
 
 compile:
 	@echo $(COMPILATION_MSG)
-	$(CXX) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
+	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
 
 install:
 ifeq ($(OS), Linux)
@@ -109,6 +120,13 @@ clean:
 	@rm *.bthl
 	@rm FileCompare
 	@rm RandFile
+
+simple-test:
+	@$(MAKE) compile CXX=clang++ TYPE=release VERSION=aesni LINK=dynamic
+	@$(MAKE) genkeys CXX=clang++
+	@$(MAKE) randfile CXX=clang++
+	@$(MAKE) encrypt_decrypt
+	@$(MAKE) checkfile CXX=clang++
 
 temp-linux-test-flow:
 

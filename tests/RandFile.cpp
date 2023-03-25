@@ -19,7 +19,7 @@ int main()
 
         //FILE0 - 10 bytes
         bconst::bytestream RandStream0;
-        for(size_t i=0; i<BYTE(10); ++i) RandStream0.push_back(random_number(rand_engine));
+        for(size_t i=0; i<BYTE(11); ++i) RandStream0.push_back(random_number(rand_engine));
         byteio::file_write("file0.subject",RandStream0);
         byteio::file_write("file0.validator",RandStream0);
 
@@ -31,7 +31,7 @@ int main()
 
         //FILE2 - 20 bytes
         bconst::bytestream RandStream2;
-        for(size_t i=0; i<BYTE(20); ++i) RandStream2.push_back(random_number(rand_engine));
+        for(size_t i=0; i<BYTE(23); ++i) RandStream2.push_back(random_number(rand_engine));
         byteio::file_write("file2.subject",RandStream2);
         byteio::file_write("file2.validator",RandStream2);
 
@@ -43,7 +43,7 @@ int main()
 
         //FILE4 - 55 mb
         bconst::bytestream RandStream4;
-        for(size_t i=0; i<MB(55); ++i) RandStream4.push_back(random_number(rand_engine));
+        for(size_t i=0; i<MB(57); ++i) RandStream4.push_back(random_number(rand_engine));
         byteio::file_write("file4.subject",RandStream4);
         byteio::file_write("file4.validator",RandStream4);
 
@@ -55,19 +55,19 @@ int main()
 
         //FILE6 - 128 mb
         bconst::bytestream RandStream6;
-        for(size_t i=0; i<MB(128); ++i) RandStream6.push_back(random_number(rand_engine));
+        for(size_t i=0; i<MB(127); ++i) RandStream6.push_back(random_number(rand_engine));
         byteio::file_write("file6.subject",RandStream6);
         byteio::file_write("file6.validator",RandStream6);
 
         //FILE7 - 192 mb
         bconst::bytestream RandStream7;
-        for(size_t i=0; i<MB(192); ++i) RandStream7.push_back(random_number(rand_engine));
+        for(size_t i=0; i<MB(193); ++i) RandStream7.push_back(random_number(rand_engine));
         byteio::file_write("file7.subject",RandStream7);
         byteio::file_write("file7.validator",RandStream7);
 
         //FILE8 - 256 mb
         bconst::bytestream RandStream8;
-        for(size_t i=0; i<MB(256); ++i) RandStream8.push_back(random_number(rand_engine));
+        for(size_t i=0; i<MB(255); ++i) RandStream8.push_back(random_number(rand_engine));
         byteio::file_write("file8.subject",RandStream8);
         byteio::file_write("file8.validator",RandStream8);
     } catch(const char* err) {
