@@ -7,7 +7,7 @@ INSTALLPATH=/usr/local/bin
 OS := $(shell uname)
 
 CXX:=g++
-CXX_STANDARD=-std=c++14
+CXX_STANDARD=-std=c++14 -Wall -Wextra
 
 ifeq ($(CXX), clang++)
 THREADING=
@@ -152,3 +152,14 @@ temp-linux-test-flow:
 	@./FileCompare
 	@$(MAKE) vig_encrypt_decrypt
 	@./FileCompare
+
+download:
+	@echo "Downloading submodules"
+	@git submodule update --init --recursive
+
+update:
+	@echo "Updating submodules"
+	@git submodule update --recursive --remote
+
+style:
+	@clang-format -i -style=file *.cpp *.hpp tests/*.hpp tests/*.cpp
