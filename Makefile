@@ -17,6 +17,13 @@ endif
 
 TYPE=release
 VERSION=portable
+LINK=dynamic
+
+ifeq ($(LINK), dynamic)
+LINKER=
+else ifeq ($(LINK), static)
+LINKER=-static
+endif
 
 ifeq ($(CXX), clang++)
 ADDRESS_SANITIZER=-fsanitize=address
@@ -27,11 +34,11 @@ THREADS_SANITIZER=
 endif
 
 ifeq ($(TYPE), release)
-CXX_FLAGS=-O3
+CXX_FLAGS=-O3 -Wall -Wextra
 else ifeq ($(TYPE), debug)
-CXX_FLAGS=-g -Wall -Wextra $(ADDRESS_SANITIZER)
+CXX_FLAGS=-O2 -Wall -Wextra $(ADDRESS_SANITIZER)
 else ifeq ($(TYPE), debug_threads)
-CXX_FLAGS=-g -Wall -Wextra $(THREADS_SANITIZER)
+CXX_FLAGS=-O2 -Wall -Wextra $(THREADS_SANITIZER)
 endif
 
 ifeq ($(VERSION), portable)
@@ -45,17 +52,21 @@ endif
 .PHONY: default environment compile install uninstall encrypt_decrypt randfile checkfile genkeys vig_encrypt_decrypt clean
 
 default:
-	@echo "makefile variables and possible values"
+	@echo "Makefile variables and possible values"
+	@echo "The the first element are always the default value"
 	@echo "CXX     : g++, clang++"
 	@echo "TYPE    : release, debug, debug_threads"
 	@echo "VERSION : portable, aesni"
+	@echo "LINK    : dynamic, static"
+	@echo ""
+	@echo "Makefile recipes"
 
 environment:
 	@echo "OS : $(OS)"
 
 compile:
 	@echo $(COMPILATION_MSG)
-	$(CXX) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
+	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
 
 install:
 ifeq ($(OS), Linux)
@@ -75,8 +86,8 @@ endif
 encrypt_decrypt:
 	@echo "Encrypting/Decrypting test files with:"
 	@./bethela --version
-	@./bethela --enc-AES256-replace AES256.key file0.subject file1.subject file2.subject file3.subject file4.subject file5.subject file6.subject file7.subject file8.subject
-	@./bethela --dec-AES256-replace AES256.key file0.subject.bthl file1.subject.bthl file2.subject.bthl file3.subject.bthl file4.subject.bthl file5.subject.bthl file6.subject.bthl file7.subject.bthl file8.subject.bthl
+	@./bethela --enc-AES256-replace AES256.key file0.subject file1.subject file2.subject file3.subject file4.subject file5.subject file6.subject file7.subject file8.subject file9.subject
+	@./bethela --dec-AES256-replace AES256.key file0.subject.bthl file1.subject.bthl file2.subject.bthl file3.subject.bthl file4.subject.bthl file5.subject.bthl file6.subject.bthl file7.subject.bthl file8.subject.bthl file9.subject.bthl
 
 randfile:
 	@echo "compiling random file generator"
@@ -110,6 +121,13 @@ clean:
 	@rm FileCompare
 	@rm RandFile
 
+simple-test:
+	@$(MAKE) compile CXX=clang++ TYPE=release VERSION=aesni LINK=dynamic
+	@$(MAKE) genkeys CXX=clang++
+	@$(MAKE) randfile CXX=clang++
+	@$(MAKE) encrypt_decrypt
+	@$(MAKE) checkfile CXX=clang++
+
 temp-linux-test-flow:
 
 	@$(MAKE) compile CXX=clang++ TYPE=debug VERSION=portable
@@ -134,3 +152,14 @@ temp-linux-test-flow:
 	@./FileCompare
 	@$(MAKE) vig_encrypt_decrypt
 	@./FileCompare
+
+download:
+	@echo "Downloading submodules"
+	@git submodule update --init --recursive
+
+update:
+	@echo "Updating submodules"
+	@git submodule update --recursive --remote
+
+style:
+	@clang-format -i -style=file *.cpp *.hpp tests/*.hpp tests/*.cpp
