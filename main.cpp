@@ -185,7 +185,7 @@ int main(int argc, char *args[]) {
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey, AES_KEY_SIZE);
 
-            Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(), loadKey.size());
+            Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
 
             TIMING_START;
             std::atomic<size_t> cnt(0);
@@ -193,7 +193,9 @@ int main(int argc, char *args[]) {
             std::cout << "Encryption : AES block cipher \n";
 
             auto encrypt_lambda = [&]() {
+                global_mtx.lock();
                 std::cout << "Encryption threads running : tid = " << std::this_thread::get_id() << "\n";
+                global_mtx.unlock();
 
                 bool run_thread = true;
 
@@ -220,12 +222,16 @@ int main(int argc, char *args[]) {
                     std::ifstream curr_file(target_file, std::ios::binary);
 
                     if (!curr_file.good()) {
+                        global_mtx.lock();
                         std::cout << "The file : " << target_file
                                   << "\n"
                                      "was not encrypted...\n"
                                      "it might be read protected, corrupted or non-existent...\n";
+                        global_mtx.unlock();
                     } else {
+                        global_mtx.lock();
                         std::cout << "encrypting : " << target_file << "...\n";
+                        global_mtx.unlock();
 
                         Krypt::Bytes *iv = keygen::random_bytestream_array(AES_BLOCKSIZE);
 
@@ -243,7 +249,7 @@ int main(int argc, char *args[]) {
 
                             if (!curr_file.eof() && read_buffer_size == BUFFER_BYTESIZE) {
                                 for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
-                                    lastBlockKrypt.blockEncrypt(
+                                    aes_scheme.blockEncrypt(
                                         reinterpret_cast<unsigned char *>(tbuffer + index),
                                         reinterpret_cast<unsigned char *>(encryptedBuffer + index), iv
                                     );
@@ -257,7 +263,7 @@ int main(int argc, char *args[]) {
                                     size_t index;
 
                                     for (index = 0; index < remaining_blocks; ++index) {
-                                        lastBlockKrypt.blockEncrypt(
+                                        aes_scheme.blockEncrypt(
                                             reinterpret_cast<unsigned char *>(tbuffer + (index * AES_BLOCKSIZE)),
                                             reinterpret_cast<unsigned char *>(
                                                 encryptedBuffer + (index * AES_BLOCKSIZE)
@@ -269,7 +275,7 @@ int main(int argc, char *args[]) {
                                         reinterpret_cast<char *>(encryptedBuffer), remaining_blocks * AES_BLOCKSIZE
                                     );
 
-                                    Krypt::ByteArray cipher = lastBlockKrypt.encrypt(
+                                    Krypt::ByteArray cipher = aes_scheme.encrypt(
                                         reinterpret_cast<unsigned char *>(tbuffer + (index * AES_BLOCKSIZE)),
                                         remaining_bytes, iv
                                     );
@@ -306,7 +312,9 @@ int main(int argc, char *args[]) {
             std::vector<std::thread> threads;
 
             for (size_t i = 0; i < processor_count - 1; ++i) {
+                global_mtx.lock();
                 threads.push_back(std::thread(encrypt_lambda));
+                global_mtx.unlock();
             }
 
             encrypt_lambda();
@@ -323,7 +331,7 @@ int main(int argc, char *args[]) {
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
             keygen::AES_KEYCHECK(loadKey, AES_KEY_SIZE);
 
-            Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> lastBlockKrypt(loadKey.data(), loadKey.size());
+            Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
 
             TIMING_START;
             std::atomic<size_t> cnt(0);
@@ -331,7 +339,9 @@ int main(int argc, char *args[]) {
             std::cout << "Decryption : AES block cipher \n";
 
             auto decrypt_lambda = [&]() {
+                global_mtx.lock();
                 std::cout << "Decryption threads running : tid = " << std::this_thread::get_id() << "\n";
+                global_mtx.unlock();
 
                 bool run_thread = true;
 
@@ -361,12 +371,16 @@ int main(int argc, char *args[]) {
                     std::ifstream curr_file(target_file, std::ios::binary);
 
                     if (!curr_file.good()) {
+                        global_mtx.lock();
                         std::cout << "The file : " << target_file
                                   << "\n"
                                      "was not decrypted...\n"
                                      "it might be read protected, corrupted or non-existent...\n";
+                        global_mtx.unlock();
                     } else {
+                        global_mtx.lock();
                         std::cout << "decrypting : " << target_file << "...\n";
+                        global_mtx.unlock();
 
                         curr_file.read(filesig, bconst::FILESIGNATURE.size());
 
@@ -386,7 +400,7 @@ int main(int argc, char *args[]) {
 
                                 if (!curr_file.eof() && read_buffer_size == BUFFER_BYTESIZE) {
                                     for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
-                                        lastBlockKrypt.blockDecrypt(
+                                        aes_scheme.blockDecrypt(
                                             reinterpret_cast<unsigned char *>(tbuffer + index),
                                             reinterpret_cast<unsigned char *>(decryptedBuffer + index), iv
                                         );
@@ -399,7 +413,7 @@ int main(int argc, char *args[]) {
                                         size_t index;
 
                                         for (index = 0; index < remaining_blocks - 1; ++index) {
-                                            lastBlockKrypt.blockDecrypt(
+                                            aes_scheme.blockDecrypt(
                                                 reinterpret_cast<unsigned char *>(tbuffer + (index * AES_BLOCKSIZE)),
                                                 reinterpret_cast<unsigned char *>(
                                                     decryptedBuffer + (index * AES_BLOCKSIZE)
@@ -412,7 +426,7 @@ int main(int argc, char *args[]) {
                                             (remaining_blocks - 1) * AES_BLOCKSIZE
                                         );
 
-                                        Krypt::ByteArray recover = lastBlockKrypt.decrypt(
+                                        Krypt::ByteArray recover = aes_scheme.decrypt(
                                             reinterpret_cast<unsigned char *>(tbuffer + (index * AES_BLOCKSIZE)),
                                             AES_BLOCKSIZE, iv
                                         );
@@ -455,7 +469,9 @@ int main(int argc, char *args[]) {
             std::vector<std::thread> threads;
 
             for (size_t i = 0; i < processor_count - 1; ++i) {
+                global_mtx.lock();
                 threads.push_back(std::thread(decrypt_lambda));
+                global_mtx.unlock();
             }
 
             decrypt_lambda();

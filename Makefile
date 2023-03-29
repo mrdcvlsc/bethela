@@ -7,7 +7,7 @@ INSTALLPATH=/usr/local/bin
 OS := $(shell uname)
 
 CXX:=g++
-CXX_STANDARD=-std=c++14 -Wall -Wextra
+CXX_STANDARD=-std=c++14
 
 ifeq ($(CXX), clang++)
 THREADING=
@@ -34,11 +34,11 @@ THREADS_SANITIZER=
 endif
 
 ifeq ($(TYPE), release)
-CXX_FLAGS=-O3
+CXX_FLAGS=-O3 -Wall -Wextra
 else ifeq ($(TYPE), debug)
-CXX_FLAGS=-g -Wall -Wextra $(ADDRESS_SANITIZER)
+CXX_FLAGS=-O2 -Wall -Wextra $(ADDRESS_SANITIZER)
 else ifeq ($(TYPE), debug_threads)
-CXX_FLAGS=-g -Wall -Wextra $(THREADS_SANITIZER)
+CXX_FLAGS=-O2 -Wall -Wextra $(THREADS_SANITIZER)
 endif
 
 ifeq ($(VERSION), portable)
