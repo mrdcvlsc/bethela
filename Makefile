@@ -49,7 +49,7 @@ COMPILATION_MSG="compiling AES-NI version"
 VERSION_FLAGS=-DUSE_AESNI -maes
 else ifeq ($(VERSION), neon)
 COMPILATION_MSG="compiling AES aarch64 neon version"
-VERSION_FLAGS=-DUSE_ARM_AES -maes
+VERSION_FLAGS=-DUSE_ARM_AES -march=armv8-a+crypto
 endif
 
 .PHONY: default environment compile install uninstall encrypt_decrypt randfile checkfile genkeys vig_encrypt_decrypt clean

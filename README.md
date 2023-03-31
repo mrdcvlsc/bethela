@@ -8,95 +8,94 @@ A simple terminal command line tool for symmetric encryption & decryption of any
 
 ## **install in Linux**
 
-<ul>
+- **Clone** and the repo
 
-**Clone and open the repo**
+    ```
+    git clone --recurse-submodules https://github.com/mrdcvlsc/bethela
+    git submodule update --init --recursive
+    cd bethela
+    ```
 
-```
-git clone --recurse-submodules https://github.com/mrdcvlsc/bethela
-git submodule update --init --recursive
-cd bethela
-```
+- **Makefile variables**
 
-**Compile with clang and aesni instructions**
+    If not specified the first values are the default values.
 
-```
-make compile CXX=clang++ VERSION=aesni TYPE=release
-```
+    | Variable    | Value                               |
+    | ----------- | ----------------------------------- | 
+    | **CXX**     | `g++`, `clang++`                    |
+    | **TYPE**    | `release`, `debug`, `debug_threads` |
+    | **VERSION** | `portable`, `aesni`, `neon`         |
+    | **LINK**    | `dynamic`, `static`                 |
 
-**Compile with clang and pure C++ implementation**
+- Example **compilation** with clang and aesni instructions
 
-```
-make compile CXX=clang++ VERSION=portable TYPE=release
-```
+    ```
+    make compile CXX=clang++ VERSION=aesni TYPE=release
+    ```
 
-**Compile with gcc and aesni instructions**
+- Example **compilation** with g++ and portable C++ code
 
-```
-make compile CXX=g++ VERSION=aesni TYPE=release
-```
+    I don't need to specify other values because here the target
+    values are already the default values.
 
-**Compile with gcc and pure C++ implementation**
+    ```
+    make compile
+    ```
 
-```
-make compile CXX=g++ VERSION=portable TYPE=release
-```
+- **Install** the program to usr/local/bin (for linux)
 
-**Install the program to usr/local/bin (for linux)**
+    ```
+    make install
+    ```
 
-```
-make install
-```
+- **Uninstall** the program to usr/local/bin (for linux)
 
-**Uninstall the program to usr/local/bin (for linux)**
-
-```
-make uninstall
-```
-
-</ul>
+    ```
+    make uninstall
+    ```
 
 ----------------------------------------------------
 
-### encrypt command format:
+- **encrypt command format:**
 
-```
-bethela --encrypt keyfile file1 file2 ... fileN
-```
-
-<br>
-
-### decrypt command format:
-
-```
-bethela --decrypt keyfile file1 file2 ... fileN
-```
-As you can see you can pass 1 or more files to the program
+    ```
+    bethela --encrypt keyfile file1 file2 ... fileN
+    ```
 
 <br>
 
-### generate key format:
+- **decrypt command format:**
 
-```
-bethela --generate keyfilename keysize
-```
-The **keysize** should be a positive number greater than 0
-
-<br>
-
-### encrypt/decrypt with replace
-
-Adding '-replace' command when encrypting/decrypting will
-replace the old files with the encrypted/decrypted files.
-
-```
-bethela --encrypt-replace keyfile file1 file2 ... fileN
-bethela --decrypt-replace keyfile file1 file2 ... fileN
-```
+    ```
+    bethela --decrypt keyfile file1 file2 ... fileN
+    ```
+    As you can see you can pass 1 or more files to the program
 
 <br>
 
-For more information about using AES and other info about the program use the command below to show the help menu
+- **generate key format:**
+
+    ```
+    bethela --generate keyfilename keysize
+    ```
+    The **keysize** should be a positive number greater than 0
+
+<br>
+
+- **encrypt/decrypt with replace**
+
+    Adding '-replace' command when encrypting/decrypting will
+    replace the old files with the encrypted/decrypted files.
+
+    ```
+    bethela --encrypt-replace keyfile file1 file2 ... fileN
+    
+    bethela --decrypt-replace keyfile file1 file2 ... fileN
+    ```
+
+<br>
+
+For more information about using **AES** and other info about the program use the command below to show the help menu
 
 ```
 bethela --help

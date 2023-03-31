@@ -7,6 +7,8 @@
 
 #if defined(USE_AESNI)
     #define CRYPTOLIB "AES-NI"
+#elif defined(USE_ARM_AES)
+    #define CRYPTOLIB "neon"
 #else
     #define CRYPTOLIB "portable"
 #endif
