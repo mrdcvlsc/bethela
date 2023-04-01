@@ -94,13 +94,13 @@ encrypt_decrypt:
 
 randfile:
 	@echo "compiling random file generator"
-	$(CXX) $(CXX_STANDARD) tests/RandFile.cpp -o RandFile -O3
+	$(CXX) $(LINKER) $(CXX_STANDARD) tests/RandFile.cpp -o RandFile -O3
 	@echo "generating random files..."
 	@./RandFile
 
 checkfile:
 	@echo "compiling equality file checker"
-	$(CXX) $(CXX_STANDARD) tests/FileCompare.cpp -o FileCompare -O3
+	$(CXX) $(LINKER) $(CXX_STANDARD) tests/FileCompare.cpp -o FileCompare -O3
 	@echo "checking random files equality..."
 	@./FileCompare
 
