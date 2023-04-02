@@ -20,7 +20,9 @@ namespace vigenere
         {
             data[i] = ((int)data[i]+(int)key[ikey])%bconst::CHARSETS;
             ikey++;
-            if(ikey>=key.size()) ikey = 0;
+            if(ikey>=key.size()) {
+                ikey = 0;
+            }
         }
     }
 
@@ -32,7 +34,9 @@ namespace vigenere
         {
             data[i] = ((int)data[i]-(int)key[ikey])%bconst::CHARSETS;
             ikey++;
-            if(ikey==key.size()) ikey = 0;
+            if(ikey==key.size()) {
+                ikey = 0;
+            }
         }
     }
 }

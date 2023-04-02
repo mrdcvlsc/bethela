@@ -69,18 +69,62 @@ int main(int argc, char *args[]) {
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
             auto start = timing_start();
-            size_t cnt = 0;
-            for (int i = STARTING_FILE; i < argc; ++i) {
-                bconst::bytestream filebytestream = byteio::file_read(args[i]);
-                if (!filebytestream.empty()) {
-                    vigenere::encrypt(filebytestream, loadKey);
-                    filebytestream.insert(
-                        filebytestream.end(), bconst::FILESIGNATURE.begin(), bconst::FILESIGNATURE.end()
-                    );
-                    cnt += byteio::file_write(args[i] + bconst::extension, filebytestream);
-                    checkif_replace(args[COMMAND], args[i]);
+            std::atomic<size_t> cnt(0);
+
+            auto encrypt_lambda = [&]() {
+                global_mtx.lock();
+                std::cout << "Encryption threads running : tid = " << std::this_thread::get_id() << "\n";
+                global_mtx.unlock();
+
+                bool run_thread = true;
+
+                while (run_thread) {
+                    std::string target_file;
+
+                    global_mtx.lock();
+                    run_thread = !file_queue.empty();
+
+                    if (run_thread) {
+                        target_file = file_queue.back();
+                        file_queue.pop_back();
+                    } else {
+                        global_mtx.unlock();
+                        break;
+                    }
+
+                    global_mtx.unlock();
+
+                    bconst::bytestream filebytestream = byteio::file_read(target_file);
+                    if (!filebytestream.empty()) {
+
+                        global_mtx.lock();
+                        std::cout << "encrypting : " << target_file << "...\n";
+                        global_mtx.unlock();
+
+                        vigenere::encrypt(filebytestream, loadKey);
+                        filebytestream.insert(
+                            filebytestream.end(), bconst::FILESIGNATURE.begin(), bconst::FILESIGNATURE.end()
+                        );
+                        cnt += byteio::file_write(target_file + bconst::extension, filebytestream);
+                        checkif_replace(args[COMMAND], target_file);
+                    }
                 }
+            };
+
+            std::vector<std::thread> threads;
+
+            for (size_t i = 0; i < processor_count - 1; ++i) {
+                global_mtx.lock();
+                threads.push_back(std::thread(encrypt_lambda));
+                global_mtx.unlock();
             }
+
+            encrypt_lambda();
+
+            for (size_t i = 0; i < processor_count - 1; ++i) {
+                threads[i].join();
+            }
+
             timing_end("En", start, cnt);
         } else if (match(args[COMMAND], DECRYPT_FLAG)) {
             std::cout << "Default Decryption : Vigenere cipher \n";
@@ -88,29 +132,76 @@ int main(int argc, char *args[]) {
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
             auto start = timing_start();
-            size_t cnt = 0;
-            for (int i = STARTING_FILE; i < argc; ++i) {
-                bconst::bytestream filebytestream = byteio::file_read(args[i]);
-                if (filebytestream.empty())
-                    continue;
+            std::atomic<size_t> cnt(0);
 
-                bconst::bytestream filesig(filebytestream.end() - bconst::FILESIGNATURE.size(), filebytestream.end());
-                if (filesig != bconst::FILESIGNATURE) {
-                    std::cerr << "The file '" << args[i] << "' is not encrypted, no need to decrypt it!\n";
-                    continue;
+            auto decrypt_lambda = [&]() {
+                global_mtx.lock();
+                std::cout << "Decryption threads running : tid = " << std::this_thread::get_id() << "\n";
+                global_mtx.unlock();
+
+                bool run_thread = true;
+
+                while (run_thread) {
+                    std::string target_file;
+
+                    global_mtx.lock();
+                    run_thread = !file_queue.empty();
+
+                    if (run_thread) {
+                        target_file = file_queue.back();
+                        file_queue.pop_back();
+                    } else {
+                        global_mtx.unlock();
+                        break;
+                    }
+
+                    global_mtx.unlock();
+                    
+                    bconst::bytestream filebytestream = byteio::file_read(target_file);
+                    if (filebytestream.empty()) {
+                        continue;
+                    }
+
+                    bconst::bytestream filesig(filebytestream.end() - bconst::FILESIGNATURE.size(), filebytestream.end());
+                    if (filesig != bconst::FILESIGNATURE) {
+                        global_mtx.lock();
+                        std::cerr << "The file '" << target_file << "' is not encrypted, no need to decrypt it!\n";
+                        global_mtx.unlock();
+                        continue;
+                    }
+
+                    filebytestream.erase(filebytestream.end() - bconst::FILESIGNATURE.size(), filebytestream.end());
+
+                    if (!filebytestream.empty()) {
+
+                        global_mtx.lock();
+                        std::cout << "decrypting : " << target_file << "...\n";
+                        global_mtx.unlock();
+
+                        vigenere::decrypt(filebytestream, loadKey);
+                        std::string output_filename(target_file);
+
+                        output_filename = output_filename.substr(0, output_filename.size() - bconst::extension.size());
+                        cnt += byteio::file_write(output_filename, filebytestream);
+                        checkif_replace(args[COMMAND], target_file);
+                    }
                 }
+            };
 
-                filebytestream.erase(filebytestream.end() - bconst::FILESIGNATURE.size(), filebytestream.end());
+            std::vector<std::thread> threads;
 
-                if (!filebytestream.empty()) {
-                    vigenere::decrypt(filebytestream, loadKey);
-                    std::string output_filename(args[i]);
-
-                    output_filename = output_filename.substr(0, output_filename.size() - bconst::extension.size());
-                    cnt += byteio::file_write(output_filename, filebytestream);
-                    checkif_replace(args[COMMAND], args[i]);
-                }
+            for (size_t i = 0; i < processor_count - 1; ++i) {
+                global_mtx.lock();
+                threads.push_back(std::thread(decrypt_lambda));
+                global_mtx.unlock();
             }
+
+            decrypt_lambda();
+
+            for (size_t i = 0; i < processor_count - 1; ++i) {
+                threads[i].join();
+            }
+
             timing_end("De", start, cnt);
         } else if (match(args[COMMAND], AES_ENCRYPT)) {
             size_t AES_KEY_SIZE = check_aes_arg(args[COMMAND]);
@@ -319,7 +410,9 @@ int main(int argc, char *args[]) {
                         curr_file.read(filesig, bconst::FILESIGNATURE.size());
 
                         if (memcmp(filesig, bconst::FILESIGNATURE.data(), bconst::FILESIGNATURE.size())) {
+                            global_mtx.lock();
                             std::cerr << "The file '" << target_file << "' is not encrypted, no need to decrypt it!\n";
+                            global_mtx.unlock();
                         } else {
                             std::ofstream output_file(outfname, std::ios::binary | std::ios::trunc);
                             output_file.close();
