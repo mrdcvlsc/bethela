@@ -1,9 +1,9 @@
 #ifndef BETHELA_BYTEIO_HPP
 #define BETHELA_BYTEIO_HPP
 
-#include <algorithm>
-#include <fstream>
 #include <iostream>
+#include <fstream>
+#include <algorithm>
 #include <utility>
 #include <vector>
 
@@ -15,8 +15,9 @@ namespace byteio {
         size_t filenameLen = 0, fullLen = fullFilePath.size();
 
         for (size_t i = 0; i < fullLen; ++i) {
-            if (fullFilePath[fullLen - 1 - i] == '/' || fullFilePath[fullLen - 1 - i] == '\\')
+            if (fullFilePath[fullLen - 1 - i] == '/' || fullFilePath[fullLen - 1 - i] == '\\') {
                 break;
+            }
             filenameLen++;
         }
 
@@ -39,8 +40,9 @@ namespace byteio {
 
     bool file_write(const std::string &outputfilename, const bconst::bytestream &filebytestream) {
         std::ofstream fileData(outputfilename, std::ios::out | std::ios::binary);
-        if (!fileData.is_open())
+        if (!fileData.is_open()) {
             return false;
+        }
         fileData.write((char *) &filebytestream[0], filebytestream.size() * sizeof(bconst::byte));
         fileData.close();
         return true;

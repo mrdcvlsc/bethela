@@ -6,7 +6,7 @@
 #include <chrono>
 #include <random>
 
-#include "../constants.hpp"
+#include "../include/constants.hpp"
 #include "keygenerator.hpp"
 
 /// Vigenère cipher

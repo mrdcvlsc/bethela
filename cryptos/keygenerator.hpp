@@ -5,7 +5,7 @@
 #include <vector>
 #include <fstream>
 
-#include "../constants.hpp"
+#include "../include/constants.hpp"
 
 namespace keygen
 {

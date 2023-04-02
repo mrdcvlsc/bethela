@@ -5,6 +5,13 @@
 #include <mutex>
 #include <thread>
 
+#include "cryptos/Krypt/src/Krypt.hpp"
+#include "cryptos/vigenere.hpp"
+
+#include "include/argscheck.hpp"
+#include "include/timing.hpp"
+#include "include/byteio.hpp"
+
 #if defined(USE_AESNI)
     #define CRYPTOLIB "AES-NI"
 #elif defined(USE_ARM_AES)
@@ -13,12 +20,7 @@
     #define CRYPTOLIB "portable"
 #endif
 
-#include "byteio.hpp"
-#include "cryptos/Krypt/src/Krypt.hpp"
-#include "cryptos/vigenere.hpp"
-
 #define BETHELA_VERSION "version 3.5.8"
-#define SIZE_T_32BIT 4
 
 #define HELP_FLAG "--help"
 #define VERSION_FLAG "--version"
@@ -30,92 +32,22 @@
 #define AES_ENCRYPT "--enc-AES"
 #define AES_DECRYPT "--dec-AES"
 
-#define AES_BLOCKSIZE 16
+using namespace Krypt;
 
-#define AES128_BYTEKEY 16
-#define AES192_BYTEKEY 24
-#define AES256_BYTEKEY 32
+constexpr size_t SIZE_T_32BIT = 4;
 
-#define COMMAND 1
-#define KEY 2
+constexpr size_t AES_BLOCKSIZE = 16;
+
+constexpr size_t AES128_BYTEKEY = 16;
+constexpr size_t AES192_BYTEKEY = 24;
+constexpr size_t AES256_BYTEKEY = 32;
+
+constexpr size_t COMMAND = 1;
+constexpr size_t KEY = 2;
 constexpr size_t STARTING_FILE = 3;
 
 /// 192 MB.
-#define BUFFER_BYTESIZE 201326592
-
-#define TIMING_START                                                                                                   \
-    std::cout << "program running, please wait...\n";                                                                  \
-    auto start = std::chrono::high_resolution_clock::now()
-
-#define TIMING_END(NAME)                                                                                               \
-    auto end = std::chrono::high_resolution_clock::now();                                                              \
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);                                \
-    std::cout << NAME << "cryption took : \n";                                                                         \
-    std::cout << "\t" << duration.count() << " milliseconds\n";                                                        \
-    std::cout << "\t" << duration.count() / 1000 << " seconds\n";                                                      \
-    std::cout << "\t" << NAME << "crypted File(s) : " << cnt << "\n"
-
-void NOTV_AES_KEY(size_t ARGS_AES_KEY_SIZE) {
-    switch (ARGS_AES_KEY_SIZE) {
-        case AES128_BYTEKEY * 8:
-            return;
-        case AES192_BYTEKEY * 8:
-            return;
-        case AES256_BYTEKEY * 8:
-            return;
-    }
-    std::cerr << "\n\tERROR: invalid AES command given\n";
-    std::cout << "\t\t : " << ARGS_AES_KEY_SIZE << "\n";
-    exit(1);
-}
-
-bool MATCH(const std::string &INPUT, const std::string &COMMAND_FLAG) {
-    for (size_t i = 0; i < COMMAND_FLAG.size() && i < INPUT.size(); ++i) {
-        if (INPUT[i] != COMMAND_FLAG[i])
-            return false;
-    }
-    return true;
-}
-
-void CHECKIF_REPLACE(const std::string &INPUT_COMMAND, const std::string &FILE_TO_REMOVE) {
-    size_t found = INPUT_COMMAND.find(REPLACE_FLAG);
-    if (found != std::string::npos) {
-        int file_not_removed = std::remove(FILE_TO_REMOVE.data());
-        if (file_not_removed) {
-            std::cout << "notice: The program cannot remove the file '" << FILE_TO_REMOVE << "'\n"
-                      << "        file location might be protected for delete actions.\n";
-        }
-    }
-}
-
-#define CHECK_AES_ARG(AES_ARG_INPUT_COMMAND)                                                                           \
-    std::string AES_ARGUMENT(AES_ARG_INPUT_COMMAND);                                                                   \
-    if (!((AES_ARGUMENT.size() != 12) ^ (AES_ARGUMENT.size() != 20))) {                                                \
-        std::cerr << "\n\tERROR: AES key length invalid\n";                                                            \
-        std::cerr << "\t       from arg " << AES_ARG_INPUT_COMMAND << "\n";                                            \
-        exit(1);                                                                                                       \
-    }                                                                                                                  \
-    std::string AES_KEY_SIZE_STR;                                                                                      \
-    AES_KEY_SIZE_STR.push_back(AES_ARG_INPUT_COMMAND[9]);                                                              \
-    AES_KEY_SIZE_STR.push_back(AES_ARG_INPUT_COMMAND[10]);                                                             \
-    AES_KEY_SIZE_STR.push_back(AES_ARG_INPUT_COMMAND[11]);                                                             \
-    size_t AES_KEY_SIZE = std::atol(AES_KEY_SIZE_STR.data());                                                          \
-    NOTV_AES_KEY(AES_KEY_SIZE);                                                                                        \
-    std::cerr << "Key length : " << AES_KEY_SIZE << "\n";
-
-void emptyFileArgs(char cmd[10], int argcnt) {
-    if (argcnt == 2) {
-        std::cerr << "\n\tERROR: command " << cmd << "\n";
-        std::cerr << "\t       no key provided\n";
-        exit(1);
-    } else if (argcnt == 3) {
-        std::cerr << "\n\tERROR: command " << cmd << "\n";
-        std::cerr << "\t       no files provided\n";
-        exit(1);
-    }
-}
-
-using namespace Krypt;
+constexpr size_t BUFFER_BYTESIZE = 201326592;
 
 std::mutex global_mtx;
 
@@ -131,12 +63,12 @@ int main(int argc, char *args[]) {
     }
 
     if (argc >= 2) {
-        if (MATCH(args[COMMAND], ENCRYPT_FLAG)) {
+        if (match(args[COMMAND], ENCRYPT_FLAG)) {
             std::cout << "Default Encryption : Vigenere cipher \n";
             emptyFileArgs(args[COMMAND], argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
-            TIMING_START;
+            auto start = timing_start();
             size_t cnt = 0;
             for (int i = STARTING_FILE; i < argc; ++i) {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
@@ -146,16 +78,16 @@ int main(int argc, char *args[]) {
                         filebytestream.end(), bconst::FILESIGNATURE.begin(), bconst::FILESIGNATURE.end()
                     );
                     cnt += byteio::file_write(args[i] + bconst::extension, filebytestream);
-                    CHECKIF_REPLACE(args[COMMAND], args[i]);
+                    checkif_replace(args[COMMAND], args[i]);
                 }
             }
-            TIMING_END("En");
-        } else if (MATCH(args[COMMAND], DECRYPT_FLAG)) {
+            timing_end("En", start, cnt);
+        } else if (match(args[COMMAND], DECRYPT_FLAG)) {
             std::cout << "Default Decryption : Vigenere cipher \n";
             emptyFileArgs(args[COMMAND], argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
 
-            TIMING_START;
+            auto start = timing_start();
             size_t cnt = 0;
             for (int i = STARTING_FILE; i < argc; ++i) {
                 bconst::bytestream filebytestream = byteio::file_read(args[i]);
@@ -176,12 +108,12 @@ int main(int argc, char *args[]) {
 
                     output_filename = output_filename.substr(0, output_filename.size() - bconst::extension.size());
                     cnt += byteio::file_write(output_filename, filebytestream);
-                    CHECKIF_REPLACE(args[COMMAND], args[i]);
+                    checkif_replace(args[COMMAND], args[i]);
                 }
             }
-            TIMING_END("De");
-        } else if (MATCH(args[COMMAND], AES_ENCRYPT)) {
-            CHECK_AES_ARG(args[COMMAND]);
+            timing_end("De", start, cnt);
+        } else if (match(args[COMMAND], AES_ENCRYPT)) {
+            size_t AES_KEY_SIZE = check_aes_arg(args[COMMAND]);
 
             emptyFileArgs(args[COMMAND], argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
@@ -189,7 +121,7 @@ int main(int argc, char *args[]) {
 
             Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
 
-            TIMING_START;
+            auto start = timing_start();
             std::atomic<size_t> cnt(0);
 
             std::cout << "Encryption : AES block cipher \n";
@@ -300,7 +232,7 @@ int main(int argc, char *args[]) {
                         memset((unsigned char *) iv, 0x00, AES_BLOCKSIZE);
                         delete[] iv;
 
-                        CHECKIF_REPLACE(args[COMMAND], target_file);
+                        checkif_replace(args[COMMAND], target_file);
                     }
                 }
 
@@ -325,9 +257,9 @@ int main(int argc, char *args[]) {
                 threads[i].join();
             }
 
-            TIMING_END("En");
-        } else if (MATCH(args[COMMAND], AES_DECRYPT)) {
-            CHECK_AES_ARG(args[COMMAND]);
+            timing_end("En", start, cnt);
+        } else if (match(args[COMMAND], AES_DECRYPT)) {
+            size_t AES_KEY_SIZE = check_aes_arg(args[COMMAND]);
 
             emptyFileArgs(args[COMMAND], argc);
             bconst::bytestream loadKey = keygen::readKey(args[KEY]);
@@ -335,7 +267,7 @@ int main(int argc, char *args[]) {
 
             Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
 
-            TIMING_START;
+            auto start = timing_start();
             std::atomic<size_t> cnt(0);
 
             std::cout << "Decryption : AES block cipher \n";
@@ -454,7 +386,7 @@ int main(int argc, char *args[]) {
                             delete[] iv;
 
                             cnt++;
-                            CHECKIF_REPLACE(args[COMMAND], target_file);
+                            checkif_replace(args[COMMAND], target_file);
                         }
                     }
                 }
@@ -482,7 +414,7 @@ int main(int argc, char *args[]) {
                 threads[i].join();
             }
 
-            TIMING_END("De");
+            timing_end("De", start, cnt);
         } else if (!strcmp(args[COMMAND], GENERATE_FLAG)) {
             if (argc == 2) {
                 std::cerr << "\n\tERROR: --generate can only be followed by the filename\n";

@@ -1,5 +1,5 @@
-#include "../byteio.hpp"
-#include "../constants.hpp"
+#include "../include/byteio.hpp"
+#include "../include/constants.hpp"
 #include <iostream>
 
 #define TOTAL_TEST 10
@@ -42,19 +42,20 @@ int main() {
     for (size_t i = 0; i < TOTAL_TEST; ++i) {
         RandFilenameTemplate[NUMBER_INDEX] = RandVFilenameTemplate[NUMBER_INDEX] = ('0' + (char) i);
         bool eq = ISEQUAL(RandFilenameTemplate, RandVFilenameTemplate);
-        if (eq)
+        if (eq) {
             std::cout << "\t\ttest " << i << " - success\n";
-        else
+        } else {
             std::cout << "\t\ttest " << i << " - failed\n";
+        }
 
         tests += eq;
     }
 
     std::cout << "\tTotal Test Passed : " << tests << "\n";
 
-    if (tests == TOTAL_TEST)
+    if (tests == TOTAL_TEST) {
         std::cout << "[PASSED]\n";
-    else {
+    } else {
         std::cout << "[FAILED]\n";
         throw std::logic_error("Some/All test failed");
     }
