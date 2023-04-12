@@ -35,6 +35,10 @@ endif
 
 ifeq ($(TYPE), release)
 CXX_FLAGS=-O3 -Wall -Wextra
+else ifeq ($(TYPE), release2)
+CXX_FLAGS=-O2 -Wall -Wextra
+else ifeq ($(TYPE), tune)
+CXX_FLAGS=-O3 -march=native -mtune=native -mcpu=native -Wall -Wextra
 else ifeq ($(TYPE), debug)
 CXX_FLAGS=-O2 -Wall -Wextra $(ADDRESS_SANITIZER)
 else ifeq ($(TYPE), debug_threads)
