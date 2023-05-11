@@ -46,8 +46,25 @@ constexpr size_t COMMAND = 1;
 constexpr size_t KEY = 2;
 constexpr size_t STARTING_FILE = 3;
 
+#ifdef _DEBUG1
+constexpr size_t BUFFER_BYTESIZE = 32;
+#elif defined(_DEBUG2)
+constexpr size_t BUFFER_BYTESIZE = 48;
+#elif defined(_DEBUG3)
+constexpr size_t BUFFER_BYTESIZE = 64;
+#elif defined(_DEBUG4)
+constexpr size_t BUFFER_BYTESIZE = 128;
+#elif defined(_DEBUG5)
+constexpr size_t BUFFER_BYTESIZE = 192;
+#elif defined(_DEBUG6)
+constexpr size_t BUFFER_BYTESIZE = 256;
+#elif defined(_DEBUG7)
+constexpr size_t BUFFER_BYTESIZE = 512;
+#else
 /// 192 MB.
-constexpr size_t BUFFER_BYTESIZE = 201326592;
+constexpr size_t MB = 192;
+constexpr size_t BUFFER_BYTESIZE = MB * 1024 * 1024;
+#endif
 
 std::mutex vector_mtx;
 std::mutex output_mtx;

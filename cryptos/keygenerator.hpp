@@ -87,7 +87,7 @@ namespace keygen
 
     bconst::bytestream readKey(const std::string& keyfile)
     {
-        return keygen::read<bconst::byte>(keyfile,bconst::FILESIGNATURE);
+        return keygen::read<bconst::byte>(keyfile, bconst::FILESIGNATURE);
     }
 
     bconst::bytestream random_bytestream(size_t byte_count)

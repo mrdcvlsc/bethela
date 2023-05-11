@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  aarch64-gcc:
+  aarch64-gcc-release-buffer-size:
 
     runs-on: ubuntu-latest
     
@@ -87,7 +87,7 @@ jobs:
     - name: Check AES encryption/decryption results
       run: ./FileCompare
 
-  clang:
+  clang-release-buffer-size:
 
     runs-on: ${{ matrix.os }}
 
@@ -167,7 +167,7 @@ jobs:
     - name: Check AES encryption/decryption results
       run: ./FileCompare
 
-  clang-windows:
+  clang-windows-release-buffer-size:
     runs-on: windows-2019
     
     steps:
@@ -212,7 +212,7 @@ jobs:
     - name: Check AES encryption/decryption results
       run: ./FileCompare
 
-  gcc:
+  gcc-release-buffer-size:
 
     runs-on: ${{ matrix.os }}
 
@@ -279,6 +279,1994 @@ jobs:
 
     - name: Compile aesni bethela with thread sanitizer
       run: make compile CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug1-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug1-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug1-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug1-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug2-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug2-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug2-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug2-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug3-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug3-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug3-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug3-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug4-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug4-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug4-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug4-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug5-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug5-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug5-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug5-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug6-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug6-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug6-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug6-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  aarch64-gcc-debug7-size:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install essentials
+      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Generate files for testing
+      run: make randfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-debug7-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug_threads VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  clang-windows-debug7-size:
+    runs-on: windows-2019
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=clang++
+
+    - name: Generate files for testing
+      run: make randfile CXX=clang++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=clang++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+  gcc-debug7-size:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2019, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download submodules
+      run: git submodule update --init --recursive
+
+    - name: Compile portable bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug VERSION=portable
+
+    - name: Generate AES encryption/decryption keys
+      run: make genkeys CXX=g++
+
+    - name: Generate files for testing
+      run: make randfile CXX=g++
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: make checkfile CXX=g++
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile portable bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug_threads VERSION=portable
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with address sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug VERSION=aesni
+
+    - name: Run AES encryption/decryption
+      run: make encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Run vigenere encryption/decryption
+      run: make vig_encrypt_decrypt
+
+    - name: Check AES encryption/decryption results
+      run: ./FileCompare
+
+    - name: Compile aesni bethela with thread sanitizer
+      run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt

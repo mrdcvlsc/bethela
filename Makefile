@@ -3,6 +3,7 @@ current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
 EXECUTABLE=bethela
 INSTALLPATH=/usr/local/bin
+DFLAGS=
 
 OS := $(shell uname)
 
@@ -73,7 +74,7 @@ environment:
 
 compile:
 	@echo $(COMPILATION_MSG)
-	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
+	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS) $(DFLAGS)
 
 install:
 ifeq ($(OS), Linux)
