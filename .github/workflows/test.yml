@@ -36,44 +36,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -116,44 +80,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -241,44 +169,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -320,44 +212,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG1 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -400,44 +256,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG1 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -525,44 +345,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG1 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -604,44 +388,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG2 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -684,44 +432,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG2 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -809,44 +521,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG2 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -888,44 +564,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG3 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -968,44 +608,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG3 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1093,44 +697,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG3 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1172,44 +740,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG4 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1252,44 +784,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG4 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1377,44 +873,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG4 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1456,44 +916,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG5 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1536,44 +960,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG5 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1661,44 +1049,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG5 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1740,44 +1092,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG6 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1820,44 +1136,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG6 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -1945,44 +1225,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG6 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -2024,44 +1268,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=aarch64-linux-gnu-g++ LINK=static
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug VERSION=neon
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG7 CXX=aarch64-linux-gnu-g++ LINK=static TYPE=debug_threads VERSION=neon
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -2104,44 +1312,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=clang++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG7 CXX=clang++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt
@@ -2229,44 +1401,8 @@ jobs:
     - name: Check AES encryption/decryption results
       run: make checkfile CXX=g++
 
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile portable bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug_threads VERSION=portable
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
     - name: Compile aesni bethela with address sanitizer
       run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug VERSION=aesni
-
-    - name: Run AES encryption/decryption
-      run: make encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Run vigenere encryption/decryption
-      run: make vig_encrypt_decrypt
-
-    - name: Check AES encryption/decryption results
-      run: ./FileCompare
-
-    - name: Compile aesni bethela with thread sanitizer
-      run: make compile DFLAGS=-D_DEBUG7 CXX=g++ TYPE=debug_threads VERSION=aesni
 
     - name: Run AES encryption/decryption
       run: make encrypt_decrypt

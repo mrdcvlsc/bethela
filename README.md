@@ -1,6 +1,6 @@
 # bethela
 
-![Ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/build-test.yml/badge.svg)
+![Ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/test.yml/badge.svg)
 
 ## **Compiles with C++14**
 
