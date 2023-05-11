@@ -99,9 +99,9 @@ int main() {
         byteio::file_write("file8.subject", RandStream8);
         byteio::file_write("file8.validator", RandStream8);
 
-        // FILE8 - 1357913579 bytes
+        // FILE9 - 1357913 bytes
         bconst::bytestream RandStream9;
-        for (size_t i = 0; i < BYTE(1357913579); ++i) {
+        for (size_t i = 0; i < BYTE(1357913); ++i) {
             RandStream9.push_back(random_number(rand_engine));
         }
 
