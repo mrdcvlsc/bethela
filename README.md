@@ -1,14 +1,18 @@
-# bethela
+# bethela - CLI file cryptography
 
 ![Ubuntu](https://github.com/mrdcvlsc/bethela/actions/workflows/test.yml/badge.svg)
 
-## **Compiles with C++14**
+A simple terminal command line tool for encryption & decryption of any files, currently supports `Vigenere`, `AES128-CBC`, `AES192-CBC` and `AES256-CBC` ciphers.
 
-A simple terminal command line tool for symmetric encryption & decryption of any files
+The program can also use hardware acceleration technology for AES ciphers using `AES-NI` (Intel and AMD CPUs) and `ARM-neon` (armv8, aarch64 CPUs) intrinsics.
 
-## **install in Linux**
+## **Install in Linux**
 
-- **Clone** and the repo
+- Requirement:
+    - **make**
+    - **compiler that can compile with or above C++14**
+
+1. **Clone** the repo
 
     ```
     git clone --recurse-submodules https://github.com/mrdcvlsc/bethela
@@ -16,9 +20,18 @@ A simple terminal command line tool for symmetric encryption & decryption of any
     cd bethela
     ```
 
-- **Makefile variables**
+2. **Compile** the program
 
-    If not specified the first values are the default values.
+    Example:
+    ```
+    make compile CXX=clang++ VERSION=aesni TYPE=release
+    ```
+
+    This table shows what values you can pass to a dflag
+    during compilation to alter the compilation behaviour.
+
+    If a variable flag is not specified, the first value in 
+    the table below are taken as the default values.
 
     | Variable    | Value                               |
     | ----------- | ----------------------------------- | 
@@ -27,76 +40,81 @@ A simple terminal command line tool for symmetric encryption & decryption of any
     | **VERSION** | `portable`, `aesni`, `neon`         |
     | **LINK**    | `dynamic`, `static`                 |
 
-- Example **compilation** with clang and aesni instructions
+    **aesni** - will enable hardware acceleration technology
+    `AES-NI` when compiling for x86-64 Intel and/or AMD CPUs.
 
-    ```
-    make compile CXX=clang++ VERSION=aesni TYPE=release
-    ```
+    **neon** - will enable hardware acceleration technology
+    in ARM when compiling for ARM armv8/aarch64 CPUs.
 
-- Example **compilation** with g++ and portable C++ code
-
-    I don't need to specify other values because here the target
-    values are already the default values.
-
-    ```
-    make compile
-    ```
-
-- **Install** the program to usr/local/bin (for linux)
+3. **Install** the program to usr/local/bin (**for linux**)
 
     ```
     make install
     ```
 
-- **Uninstall** the program to usr/local/bin (for linux)
+    To **Uninstall** the program in usr/local/bin (**for linux**), use
+    the command below
 
     ```
     make uninstall
     ```
 
-----------------------------------------------------
+-----
 
-- **encrypt command format:**
+### **Generate a key file:**
 
-    ```
-    bethela --encrypt keyfile file1 file2 ... fileN
-    ```
+```cmd
+bethela --generate key_filename key_size_in_bytes
+```
 
-<br>
+The **key size** should be a positive number greater than 0
 
-- **decrypt command format:**
+-----
 
-    ```
-    bethela --decrypt keyfile file1 file2 ... fileN
-    ```
-    As you can see you can pass 1 or more files to the program
+### **Encrypt/Decrypt with replace**
 
-<br>
+Adding `-replace` command when encrypting/decrypting will
+replace the old files with the encrypted/decrypted files.
 
-- **generate key format:**
+-----
 
-    ```
-    bethela --generate keyfilename keysize
-    ```
-    The **keysize** should be a positive number greater than 0
+### **Vigenere Cipher**
+Requires any key file sizes.
+```
+bethela --encrypt-replace keyfile file1 file2 ... fileN
+bethela --decrypt-replace keyfile file1.bthl file2.bthl ... fileN.bthl
+```
 
-<br>
+-----
 
-- **encrypt/decrypt with replace**
+### **AES-128**
+Requires a 128-bit key, or 16 byte key file size.
+```
+bethela --enc-AES128-replace keyfile file1 file2 ... fileN
+bethela --dec-AES128-replace keyfile file1.bthl file2.bthl ... fileN.bthl
+```
 
-    Adding '-replace' command when encrypting/decrypting will
-    replace the old files with the encrypted/decrypted files.
+-----
 
-    ```
-    bethela --encrypt-replace keyfile file1 file2 ... fileN
-    
-    bethela --decrypt-replace keyfile file1 file2 ... fileN
-    ```
+### **AES-192**
+Requires a 192-bit key, or 24 byte key file size.
+```
+bethela --enc-AES192-replace keyfile file1 file2 ... fileN
+bethela --dec-AES192-replace keyfile file1.bthl file2.bthl ... fileN.bthl
+```
 
-<br>
+-----
 
-For more information about using **AES** and other info about the program use the command below to show the help menu
+### **AES-256**
+Requires a 256-bit key, or 32 byte key file size.
+```
+bethela --enc-AES256-replace keyfile file1 file2 ... fileN
+bethela --dec-AES256-replace keyfile file1.bthl file2.bthl ... fileN.bthl
+```
 
+-----
+
+###  **Help flag**
 ```
 bethela --help
 ```
