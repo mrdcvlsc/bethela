@@ -20,7 +20,7 @@
   #define CRYPTOLIB "portable"
 #endif
 
-#define BETHELA_VERSION "version 3.6.0"
+#define BETHELA_VERSION "version 3.6.1"
 
 #define HELP_FLAG "--help"
 #define VERSION_FLAG "--version"
@@ -404,9 +404,9 @@ int main(int argc, char *args[]) {
 
         char *next_buffer = new char[BUFFER_BYTESIZE];
         char *prev_buffer = new char[BUFFER_BYTESIZE];
+        Krypt::Bytes *decryptedBuffer = new Krypt::Bytes[BUFFER_BYTESIZE];
 
         char *filesig = new char[bconst::FILESIGNATURE.size()];
-        Krypt::Bytes *decryptedBuffer = new Krypt::Bytes[BUFFER_BYTESIZE];
 
         while (run_thread) {
           std::string target_file;

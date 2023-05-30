@@ -10,7 +10,7 @@ The program can also use hardware acceleration technology for AES ciphers using 
 
 - Requirement:
     - **make**
-    - **compiler that can compile with or above C++14**
+    - **compiler that can compile with or above C++17**
 
 1. **Clone** the repo
 

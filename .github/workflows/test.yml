@@ -15,8 +15,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -191,8 +194,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -367,8 +373,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -543,8 +552,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -719,8 +731,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -895,8 +910,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -1071,8 +1089,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
@@ -1247,8 +1268,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update and Upgrade
+      run: sudo apt-get update && sudo apt-get upgrade
+    
     - name: Install essentials
-      run: sudo apt install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+      run: sudo apt-get install qemu-user qemu-user-static gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
 
     - name: Download submodules
       run: git submodule update --init --recursive
