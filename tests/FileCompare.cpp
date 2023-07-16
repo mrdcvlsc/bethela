@@ -10,7 +10,18 @@ bool ISEQUAL(const std::string &FileA, const std::string &FileB) {
   bconst::bytestream B = byteio::file_read(FileB);
 
   if (A.size() != B.size()) {
-    std::cout << "\n\t\tSize is not equal\n";
+    std::cout << "\n\t\tSize is not equal (" << A.size() << ", " << B.size() << ")";
+
+    size_t not_equal = 0;
+    for (size_t i = 0; i < A.size(); ++i) {
+      if (A[i] != B[i]) {
+        not_equal++;
+      }
+    }
+
+    float equality = ((float) A.size() - (float) not_equal) / (float) A.size();
+    std::cout << "\n\t\tEqual by : " << equality * 100.0f << " percent\n";
+
     return false;
   } else if (A.size() <= 0 || B.size() <= 0) {
     return false;
