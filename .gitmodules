@@ -1,3 +1,12 @@
 [submodule "cryptos/Krypt"]
 	path = cryptos/Krypt
 	url = https://github.com/mrdcvlsc/Krypt
+[submodule "include/AES"]
+	path = include/AES
+	url = https://github.com/mrdcvlsc/AES
+[submodule "include/BytePadding"]
+	path = include/BytePadding
+	url = https://github.com/mrdcvlsc/BytePadding
+[submodule "include/BlockCipherModes"]
+	path = include/BlockCipherModes
+	url = https://github.com/mrdcvlsc/BlockCipherModes
