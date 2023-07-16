@@ -12,6 +12,10 @@
 #include "include/byteio.hpp"
 #include "include/timing.hpp"
 
+#include "include/AES/AES.hpp"
+#include "include/BlockCipherModes/BlockCipherModes/cbc.hpp"
+#include "include/BytePadding/padding/PKCS_5_7.hpp"
+
 #if defined(USE_AESNI)
   #define CRYPTOLIB "AES-NI"
 #elif defined(USE_ARM_AES)
@@ -35,8 +39,6 @@
 #define AES128_BYTE_KEY_size 16;
 #define AES192_BYTE_KEY_size 24;
 #define AES256_BYTE_KEY_size 32;
-
-using namespace Krypt;
 
 constexpr size_t SIZE_T_32BIT = 4;
 
@@ -232,7 +234,7 @@ int main(int argc, char *args[]) {
     bconst::bytestream loadKey = keygen::readKey(args[KEY]);
     keygen::AES_KEYCHECK(loadKey, AES_KEY_SIZE);
 
-    Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
+    Krypt::Mode::CBC<Krypt::BlockCipher::AES, Krypt::Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
 
     auto start = timing_start();
     std::atomic<size_t> cnt(0);
@@ -392,7 +394,7 @@ int main(int argc, char *args[]) {
     bconst::bytestream loadKey = keygen::readKey(args[KEY]);
     keygen::AES_KEYCHECK(loadKey, AES_KEY_SIZE);
 
-    Mode::CBC<BlockCipher::AES, Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
+    Krypt::Mode::CBC<Krypt::BlockCipher::AES, Krypt::Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
 
     auto start = timing_start();
     std::atomic<size_t> cnt(0);
