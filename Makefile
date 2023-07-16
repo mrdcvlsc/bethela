@@ -8,7 +8,7 @@ DFLAGS=
 OS := $(shell uname)
 
 CXX:=g++
-CXX_STANDARD=-std=c++14
+CXX_STANDARD=-std=c++17
 
 ifeq ($(CXX), clang++)
 THREADING=

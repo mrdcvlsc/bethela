@@ -228,6 +228,8 @@ int main(int argc, char *args[]) {
 
     timing_end("De", start, cnt);
   } else if (match(args[COMMAND], AES_ENCRYPT)) {
+    // aes encryption
+
     size_t AES_KEY_SIZE = check_aes_arg(args[COMMAND]);
 
     emptyFileArgs(args[COMMAND], argc);
@@ -248,6 +250,7 @@ int main(int argc, char *args[]) {
 
       bool run_thread = true;
 
+      
       char *next_buffer = new char[BUFFER_BYTESIZE];
       char *prev_buffer = new char[BUFFER_BYTESIZE];
       Krypt::Bytes *enc_buffer = new Krypt::Bytes[BUFFER_BYTESIZE];
@@ -388,6 +391,8 @@ int main(int argc, char *args[]) {
 
     timing_end("En", start, cnt);
   } else if (match(args[COMMAND], AES_DECRYPT)) {
+    // aes decryption
+
     size_t AES_KEY_SIZE = check_aes_arg(args[COMMAND]);
 
     emptyFileArgs(args[COMMAND], argc);
