@@ -250,10 +250,7 @@ int main(int argc, char *args[]) {
 
       bool run_thread = true;
 
-      
-      char *next_buffer = new char[BUFFER_BYTESIZE];
-      char *prev_buffer = new char[BUFFER_BYTESIZE];
-      Krypt::Bytes *enc_buffer = new Krypt::Bytes[BUFFER_BYTESIZE];
+      char *read_buffer = new char[BUFFER_BYTESIZE];
 
       while (run_thread) {
         std::string target_file;
@@ -295,84 +292,100 @@ int main(int argc, char *args[]) {
           output_file.open(outfname, std::ios::binary | std::ios::app);
           output_file.write(reinterpret_cast<const char *>(iv), AES_BLOCKSIZE);
 
-          char *swap_buffer_ptr;
+          // new encryption
 
-          curr_file.read(prev_buffer, BUFFER_BYTESIZE);
-          size_t prev_buffer_size = curr_file.gcount();
-          size_t next_buffer_size = 0;
+          /// last read block of buffer is empty.
+          bool last_read_empty = false;
+
+          /// second last read block is a whole BUFFER_BYTESIZE.
+          bool prev_read_whole = true;
+
+          char empty_padding_block[AES_BLOCKSIZE] = {
+              0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+          };
+
+          char encrypted_block_holder[AES_BLOCKSIZE] = {};
 
           while (!curr_file.eof()) {
-            curr_file.read(next_buffer, BUFFER_BYTESIZE);
-            next_buffer_size = curr_file.gcount();
+            curr_file.read(read_buffer, BUFFER_BYTESIZE);
+            size_t read_buffer_size = curr_file.gcount();
 
-            if (!next_buffer_size) {
+            last_read_empty = !read_buffer_size;
+            if (last_read_empty) {
+              // no bytes left to read.
               break;
             }
 
-            for (size_t index = 0; index < prev_buffer_size; index += AES_BLOCKSIZE) {
-              aes_scheme.blockEncrypt(
-                  reinterpret_cast<unsigned char *>(prev_buffer + index),
-                  reinterpret_cast<unsigned char *>(enc_buffer + index), iv
-              );
+            prev_read_whole = read_buffer_size == BUFFER_BYTESIZE;
+
+            if (prev_read_whole) { // just encrypt all the blocks.
+              for (size_t index = 0; index < BUFFER_BYTESIZE; index += AES_BLOCKSIZE) {
+                aes_scheme.blockEncrypt(
+                    reinterpret_cast<unsigned char *>(read_buffer + index),
+                    reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+                );
+                std::memcpy(read_buffer + index, encrypted_block_holder, AES_BLOCKSIZE);
+              }
+
+              output_file.write(reinterpret_cast<char *>(read_buffer), BUFFER_BYTESIZE);
+            } else if (read_buffer_size % AES_BLOCKSIZE == 0) {
+              for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
+                aes_scheme.blockEncrypt(
+                    reinterpret_cast<unsigned char *>(read_buffer + index),
+                    reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+                );
+                std::memcpy(read_buffer + index, encrypted_block_holder, AES_BLOCKSIZE);
+              }
+
+              last_read_empty = prev_read_whole = true;
+
+              output_file.write(reinterpret_cast<char *>(read_buffer), read_buffer_size);
+              break;
+            } else { // this branch in decryption is non existent.
+              size_t remaining_blocks = read_buffer_size / AES_BLOCKSIZE;
+              size_t remaining_bytes = read_buffer_size % AES_BLOCKSIZE;
+              size_t index = 0;
+
+              if (remaining_blocks) {
+                for (; index < remaining_blocks; ++index) {
+                  aes_scheme.blockEncrypt(
+                      reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)),
+                      reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+                  );
+                  std::memcpy(read_buffer + (index * AES_BLOCKSIZE), encrypted_block_holder, AES_BLOCKSIZE);
+                }
+
+                output_file.write(reinterpret_cast<char *>(read_buffer), remaining_blocks * AES_BLOCKSIZE);
+              }
+
+              if (remaining_bytes) {
+                Krypt::ByteArray cipher = aes_scheme.encrypt(
+                    reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)), remaining_bytes, iv
+                );
+                output_file.write(reinterpret_cast<char *>(cipher.array), cipher.length);
+              }
             }
-
-            output_file.write(reinterpret_cast<char *>(enc_buffer), prev_buffer_size);
-
-            swap_buffer_ptr = next_buffer;
-            next_buffer = prev_buffer;
-            prev_buffer = swap_buffer_ptr;
-            swap_buffer_ptr = nullptr;
-            std::swap(next_buffer_size, prev_buffer_size);
           }
 
-          size_t remaining_blocks = prev_buffer_size / AES_BLOCKSIZE;
-          size_t remaining_bytes = prev_buffer_size % AES_BLOCKSIZE;
-          size_t index = 0;
-
-          bool excludeLastBlock = (remaining_blocks && remaining_bytes == 0);
-
-          if (remaining_blocks) {
-            for (; index < remaining_blocks - excludeLastBlock; ++index) {
-              aes_scheme.blockEncrypt(
-                  reinterpret_cast<unsigned char *>(prev_buffer + (index * AES_BLOCKSIZE)),
-                  reinterpret_cast<unsigned char *>(enc_buffer + (index * AES_BLOCKSIZE)), iv
-              );
-            }
-
-            output_file.write(
-                reinterpret_cast<char *>(enc_buffer), (remaining_blocks - excludeLastBlock) * AES_BLOCKSIZE
+          if (last_read_empty && prev_read_whole) {
+            aes_scheme.blockEncrypt(
+                reinterpret_cast<unsigned char *>(empty_padding_block),
+                reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
             );
+
+            output_file.write(reinterpret_cast<char *>(encrypted_block_holder), AES_BLOCKSIZE);
           }
 
-          Krypt::ByteArray cipher;
-
-          if (excludeLastBlock) {
-            cipher = aes_scheme.encrypt(
-                reinterpret_cast<unsigned char *>(prev_buffer + (index * AES_BLOCKSIZE)), AES_BLOCKSIZE, iv
-            );
-          } else {
-            cipher = aes_scheme.encrypt(
-                reinterpret_cast<unsigned char *>(prev_buffer + (index * AES_BLOCKSIZE)), remaining_bytes, iv
-            );
-          }
-
-          output_file.write(reinterpret_cast<char *>(cipher.array), cipher.length);
-
+          // new encryption
           cnt++;
 
           std::memset((unsigned char *) iv, 0x00, AES_BLOCKSIZE);
           delete[] iv;
-
           checkif_replace(args[COMMAND], target_file);
         }
       }
 
-      std::memset((char *) next_buffer, 0x00, BUFFER_BYTESIZE);
-      std::memset((Krypt::Bytes *) enc_buffer, 0x00, BUFFER_BYTESIZE);
-
-      delete[] next_buffer;
-      delete[] prev_buffer;
-      delete[] enc_buffer;
+      delete[] read_buffer;
     };
 
     std::vector<std::thread> threads;

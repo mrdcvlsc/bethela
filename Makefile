@@ -3,7 +3,7 @@ current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
 EXECUTABLE=bethela
 INSTALLPATH=/usr/local/bin
-DFLAGS=
+RBUFFER_FLAG=
 
 OS := $(shell uname)
 
@@ -57,6 +57,10 @@ COMPILATION_MSG="compiling AES aarch64 neon version"
 VERSION_FLAGS=-DUSE_ARM_AES -D_USE_ARM_NEON_AES -march=armv8-a+crypto
 endif
 
+ifeq ($(RBUFFER), stack)
+RBUFFER_FLAG=-D_USE_RBUFFER_ON_STACK
+endif
+
 .PHONY: default environment compile install uninstall encrypt_decrypt randfile checkfile genkeys vig_encrypt_decrypt clean
 
 default:
@@ -66,6 +70,7 @@ default:
 	@echo "TYPE    : release, debug, debug_threads"
 	@echo "VERSION : portable, aesni, neon"
 	@echo "LINK    : dynamic, static"
+	@echo "RBUFFER : heap, stack"
 	@echo ""
 	@echo "Makefile recipes"
 
@@ -74,7 +79,7 @@ environment:
 
 compile:
 	@echo $(COMPILATION_MSG)
-	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS) $(DFLAGS)
+	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(RBUFFER_FLAG) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
 
 install:
 ifeq ($(OS), Linux)
@@ -130,7 +135,7 @@ clean:
 	@rm RandFile
 
 simple-test:
-	@$(MAKE) compile CXX=clang++ TYPE=release VERSION=aesni LINK=dynamic
+	@$(MAKE) compile CXX=clang++ TYPE=debug VERSION=aesni LINK=dynamic
 	@$(MAKE) genkeys CXX=clang++
 	@$(MAKE) randfile CXX=clang++
 	@$(MAKE) encrypt_decrypt
