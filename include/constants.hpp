@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <array>
 
 // bethela constants and type namespace
 namespace bconst {
@@ -15,6 +16,7 @@ namespace bconst {
 
     const static std::string extension = ".bthl";
     const static std::vector<byte> FILESIGNATURE({'B', 'E', 'T', 'H', 'E', 'L', 'A'});
+    constexpr static std::array<unsigned char, 7> FileSignature = {'B', 'E', 'T', 'H', 'E', 'L', 'A'};
 } // namespace bconst
 
 #endif

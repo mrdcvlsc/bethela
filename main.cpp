@@ -24,7 +24,7 @@
   #define CRYPTOLIB "portable"
 #endif
 
-#define BETHELA_VERSION "version 4.0.0"
+#define BETHELA_VERSION "version 4.0.1"
 
 #define HELP_FLAG "--help"
 #define VERSION_FLAG "--version"
@@ -62,6 +62,8 @@ constexpr size_t BUFFER_BYTESIZE = 192;
 constexpr size_t BUFFER_BYTESIZE = 256;
 #elif defined(_DEBUG7)
 constexpr size_t BUFFER_BYTESIZE = 512;
+#elif defined(_DEBUG8)
+constexpr size_t BUFFER_BYTESIZE = 131072;
 #else
 /// 128 MB.
 constexpr size_t MB = 128;
@@ -283,7 +285,18 @@ int main(int argc, char *args[]) {
           std::cout << "encrypting : " << target_file << "...\n";
           output_mtx.unlock();
 
-          Krypt::Bytes *iv = keygen::random_bytestream_array(AES_BLOCKSIZE);
+          // =========================== Generate Random IV ===========================
+          // TODO: Use a Secure Random Generator in the future.
+          unsigned char iv[AES_BLOCKSIZE];
+
+          unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+          std::mt19937_64 rand_engine(seed);
+          std::uniform_int_distribution<int> random_number(bconst::MIN, bconst::MAX);
+
+          for (size_t i = 0; i < AES_BLOCKSIZE; ++i) {
+            iv[i] = random_number(rand_engine);
+          }
+          // ==========================================================================
 
           std::ofstream output_file(outfname, std::ios::binary | std::ios::trunc);
           output_file.write(reinterpret_cast<const char *>(bconst::FILESIGNATURE.data()), bconst::FILESIGNATURE.size());
@@ -355,8 +368,8 @@ int main(int argc, char *args[]) {
 
               if (remaining_bytes) {
                 Padding::ByteArray padded = Padding::PKCS_5_7::Add(
-                  reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)),
-                  remaining_bytes, AES_BLOCKSIZE
+                    reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)), remaining_bytes,
+                    AES_BLOCKSIZE
                 );
 
                 Mode::CBC<AES_BLOCKSIZE>::encrypt(
@@ -381,7 +394,6 @@ int main(int argc, char *args[]) {
           cnt++;
 
           std::memset((unsigned char *) iv, 0x00, AES_BLOCKSIZE);
-          delete[] iv;
           checkif_replace(args[COMMAND], target_file);
         }
       }
@@ -428,7 +440,7 @@ int main(int argc, char *args[]) {
       bool run_thread = true;
 
       char *read_buffer = new char[BUFFER_BYTESIZE];
-      char *filesig = new char[bconst::FILESIGNATURE.size()];
+      char filesig[bconst::FileSignature.size()];
 
       while (run_thread) {
         std::string target_file;
@@ -494,10 +506,8 @@ int main(int argc, char *args[]) {
             if (lastblock_remains) {
               if (read_buffer_size) {
                 Mode::CBC<AES_BLOCKSIZE>::decrypt(
-                  reinterpret_cast<unsigned char *>(last_block), iv,
-                  [&aes_cipher](unsigned char* block) {
-                    aes_cipher.decrypt_block(block);
-                  }
+                    reinterpret_cast<unsigned char *>(last_block), iv,
+                    [&aes_cipher](unsigned char *block) { aes_cipher.decrypt_block(block); }
                 );
 
                 output_file.write(reinterpret_cast<char *>(last_block), AES_BLOCKSIZE);
@@ -511,10 +521,8 @@ int main(int argc, char *args[]) {
               size_t index;
               for (index = 0; index < BUFFER_SIZE_NOLAST; index += AES_BLOCKSIZE) {
                 Mode::CBC<AES_BLOCKSIZE>::decrypt(
-                  reinterpret_cast<unsigned char *>(read_buffer + index), iv,
-                  [&aes_cipher](unsigned char* block) {
-                    aes_cipher.decrypt_block(block);
-                  }
+                    reinterpret_cast<unsigned char *>(read_buffer + index), iv,
+                    [&aes_cipher](unsigned char *block) { aes_cipher.decrypt_block(block); }
                 );
               }
 
@@ -524,10 +532,8 @@ int main(int argc, char *args[]) {
               size_t index;
               for (index = 0; index < read_buffer_size - AES_BLOCKSIZE; index += AES_BLOCKSIZE) {
                 Mode::CBC<AES_BLOCKSIZE>::decrypt(
-                  reinterpret_cast<unsigned char *>(read_buffer + index), iv,
-                  [&aes_cipher](unsigned char* block) {
-                    aes_cipher.decrypt_block(block);
-                  }
+                    reinterpret_cast<unsigned char *>(read_buffer + index), iv,
+                    [&aes_cipher](unsigned char *block) { aes_cipher.decrypt_block(block); }
                 );
               }
 
@@ -540,10 +546,8 @@ int main(int argc, char *args[]) {
 
           if (lastblock_remains) {
             Mode::CBC<AES_BLOCKSIZE>::decrypt(
-              reinterpret_cast<unsigned char *>(last_block), iv,
-              [&aes_cipher](unsigned char* block) {
-                aes_cipher.decrypt_block(block);
-              }
+                reinterpret_cast<unsigned char *>(last_block), iv,
+                [&aes_cipher](unsigned char *block) { aes_cipher.decrypt_block(block); }
             );
 
             if (last_block[AES_BLOCKSIZE - 1] < 0x10) {
@@ -566,7 +570,6 @@ int main(int argc, char *args[]) {
       std::memset((char *) filesig, 0x00, bconst::FILESIGNATURE.size());
 
       delete[] read_buffer;
-      delete[] filesig;
     };
 
     std::vector<std::thread> threads;
