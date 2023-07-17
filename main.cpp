@@ -24,7 +24,7 @@
   #define CRYPTOLIB "portable"
 #endif
 
-#define BETHELA_VERSION "version 3.7.0"
+#define BETHELA_VERSION "version 4.0.0"
 
 #define HELP_FLAG "--help"
 #define VERSION_FLAG "--version"
@@ -236,7 +236,7 @@ int main(int argc, char *args[]) {
     bconst::bytestream loadKey = keygen::readKey(args[KEY]);
     keygen::AES_KEYCHECK(loadKey, AES_KEY_SIZE);
 
-    Krypt::Mode::CBC<Krypt::BlockCipher::AES, Krypt::Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
+    Cipher::Aes<256> aes_cipher(loadKey.data());
 
     auto start = timing_start();
     std::atomic<size_t> cnt(0);
@@ -304,8 +304,6 @@ int main(int argc, char *args[]) {
               0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
           };
 
-          char encrypted_block_holder[AES_BLOCKSIZE] = {};
-
           while (!curr_file.eof()) {
             curr_file.read(read_buffer, BUFFER_BYTESIZE);
             size_t read_buffer_size = curr_file.gcount();
@@ -320,21 +318,19 @@ int main(int argc, char *args[]) {
 
             if (prev_read_whole) { // just encrypt all the blocks.
               for (size_t index = 0; index < BUFFER_BYTESIZE; index += AES_BLOCKSIZE) {
-                aes_scheme.blockEncrypt(
-                    reinterpret_cast<unsigned char *>(read_buffer + index),
-                    reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+                Mode::CBC<AES_BLOCKSIZE>::encrypt(
+                    reinterpret_cast<unsigned char *>(read_buffer + index), iv,
+                    [&aes_cipher](unsigned char *block) { aes_cipher.encrypt_block(block); }
                 );
-                std::memcpy(read_buffer + index, encrypted_block_holder, AES_BLOCKSIZE);
               }
 
               output_file.write(reinterpret_cast<char *>(read_buffer), BUFFER_BYTESIZE);
             } else if (read_buffer_size % AES_BLOCKSIZE == 0) {
               for (size_t index = 0; index < read_buffer_size; index += AES_BLOCKSIZE) {
-                aes_scheme.blockEncrypt(
-                    reinterpret_cast<unsigned char *>(read_buffer + index),
-                    reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+                Mode::CBC<AES_BLOCKSIZE>::encrypt(
+                    reinterpret_cast<unsigned char *>(read_buffer + index), iv,
+                    [&aes_cipher](unsigned char *block) { aes_cipher.encrypt_block(block); }
                 );
-                std::memcpy(read_buffer + index, encrypted_block_holder, AES_BLOCKSIZE);
               }
 
               last_read_empty = prev_read_whole = true;
@@ -348,32 +344,37 @@ int main(int argc, char *args[]) {
 
               if (remaining_blocks) {
                 for (; index < remaining_blocks; ++index) {
-                  aes_scheme.blockEncrypt(
-                      reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)),
-                      reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+                  Mode::CBC<AES_BLOCKSIZE>::encrypt(
+                      reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)), iv,
+                      [&aes_cipher](unsigned char *block) { aes_cipher.encrypt_block(block); }
                   );
-                  std::memcpy(read_buffer + (index * AES_BLOCKSIZE), encrypted_block_holder, AES_BLOCKSIZE);
                 }
 
                 output_file.write(reinterpret_cast<char *>(read_buffer), remaining_blocks * AES_BLOCKSIZE);
               }
 
               if (remaining_bytes) {
-                Krypt::ByteArray cipher = aes_scheme.encrypt(
-                    reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)), remaining_bytes, iv
+                Padding::ByteArray padded = Padding::PKCS_5_7::Add(
+                  reinterpret_cast<unsigned char *>(read_buffer + (index * AES_BLOCKSIZE)),
+                  remaining_bytes, AES_BLOCKSIZE
                 );
-                output_file.write(reinterpret_cast<char *>(cipher.array), cipher.length);
+
+                Mode::CBC<AES_BLOCKSIZE>::encrypt(
+                    reinterpret_cast<unsigned char *>(&padded[0]), iv,
+                    [&aes_cipher](unsigned char *block) { aes_cipher.encrypt_block(block); }
+                );
+
+                output_file.write(reinterpret_cast<char *>(&padded[0]), padded.size());
               }
             }
           }
 
           if (last_read_empty && prev_read_whole) {
-            aes_scheme.blockEncrypt(
-                reinterpret_cast<unsigned char *>(empty_padding_block),
-                reinterpret_cast<unsigned char *>(encrypted_block_holder), iv
+            Mode::CBC<AES_BLOCKSIZE>::encrypt(
+                reinterpret_cast<unsigned char *>(empty_padding_block), iv,
+                [&aes_cipher](unsigned char *block) { aes_cipher.encrypt_block(block); }
             );
-
-            output_file.write(reinterpret_cast<char *>(encrypted_block_holder), AES_BLOCKSIZE);
+            output_file.write(reinterpret_cast<char *>(empty_padding_block), AES_BLOCKSIZE);
           }
 
           // new encryption
