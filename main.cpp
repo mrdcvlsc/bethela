@@ -413,7 +413,7 @@ int main(int argc, char *args[]) {
     bconst::bytestream loadKey = keygen::readKey(args[KEY]);
     keygen::AES_KEYCHECK(loadKey, AES_KEY_SIZE);
 
-    Krypt::Mode::CBC<Krypt::BlockCipher::AES, Krypt::Padding::PKCS_5_7> aes_scheme(loadKey.data(), loadKey.size());
+    Cipher::Aes<256> aes_cipher(loadKey.data());
 
     auto start = timing_start();
     std::atomic<size_t> cnt(0);
@@ -483,7 +483,6 @@ int main(int argc, char *args[]) {
           // new decryption
 
           constexpr size_t BUFFER_SIZE_NOLAST = BUFFER_BYTESIZE - AES_BLOCKSIZE;
-          char decrypted_block_holder[AES_BLOCKSIZE] = {};
           char last_block[AES_BLOCKSIZE] = {};
 
           bool lastblock_remains = false;
@@ -494,11 +493,14 @@ int main(int argc, char *args[]) {
 
             if (lastblock_remains) {
               if (read_buffer_size) {
-                aes_scheme.blockDecrypt(
-                    reinterpret_cast<unsigned char *>(last_block),
-                    reinterpret_cast<unsigned char *>(decrypted_block_holder), iv
+                Mode::CBC<AES_BLOCKSIZE>::decrypt(
+                  reinterpret_cast<unsigned char *>(last_block), iv,
+                  [&aes_cipher](unsigned char* block) {
+                    aes_cipher.decrypt_block(block);
+                  }
                 );
-                output_file.write(reinterpret_cast<char *>(decrypted_block_holder), AES_BLOCKSIZE);
+
+                output_file.write(reinterpret_cast<char *>(last_block), AES_BLOCKSIZE);
                 lastblock_remains = false;
               } else {
                 break;
@@ -508,11 +510,12 @@ int main(int argc, char *args[]) {
             if (read_buffer_size == BUFFER_BYTESIZE) {
               size_t index;
               for (index = 0; index < BUFFER_SIZE_NOLAST; index += AES_BLOCKSIZE) {
-                aes_scheme.blockDecrypt(
-                    reinterpret_cast<unsigned char *>(read_buffer + index),
-                    reinterpret_cast<unsigned char *>(decrypted_block_holder), iv
+                Mode::CBC<AES_BLOCKSIZE>::decrypt(
+                  reinterpret_cast<unsigned char *>(read_buffer + index), iv,
+                  [&aes_cipher](unsigned char* block) {
+                    aes_cipher.decrypt_block(block);
+                  }
                 );
-                std::memcpy(read_buffer + index, decrypted_block_holder, AES_BLOCKSIZE);
               }
 
               output_file.write(reinterpret_cast<char *>(read_buffer), BUFFER_SIZE_NOLAST);
@@ -520,11 +523,12 @@ int main(int argc, char *args[]) {
             } else if (read_buffer_size % AES_BLOCKSIZE == 0) {
               size_t index;
               for (index = 0; index < read_buffer_size - AES_BLOCKSIZE; index += AES_BLOCKSIZE) {
-                aes_scheme.blockDecrypt(
-                    reinterpret_cast<unsigned char *>(read_buffer + index),
-                    reinterpret_cast<unsigned char *>(decrypted_block_holder), iv
+                Mode::CBC<AES_BLOCKSIZE>::decrypt(
+                  reinterpret_cast<unsigned char *>(read_buffer + index), iv,
+                  [&aes_cipher](unsigned char* block) {
+                    aes_cipher.decrypt_block(block);
+                  }
                 );
-                std::memcpy(read_buffer + index, decrypted_block_holder, AES_BLOCKSIZE);
               }
 
               output_file.write(reinterpret_cast<char *>(read_buffer), read_buffer_size - AES_BLOCKSIZE);
@@ -535,10 +539,17 @@ int main(int argc, char *args[]) {
           }
 
           if (lastblock_remains) {
-            Krypt::ByteArray recover =
-                aes_scheme.decrypt(reinterpret_cast<unsigned char *>(last_block), AES_BLOCKSIZE, iv);
+            Mode::CBC<AES_BLOCKSIZE>::decrypt(
+              reinterpret_cast<unsigned char *>(last_block), iv,
+              [&aes_cipher](unsigned char* block) {
+                aes_cipher.decrypt_block(block);
+              }
+            );
 
-            output_file.write(reinterpret_cast<char *>(recover.array), recover.length);
+            if (last_block[AES_BLOCKSIZE - 1] < 0x10) {
+              output_file.write(reinterpret_cast<char *>(last_block), AES_BLOCKSIZE - last_block[AES_BLOCKSIZE - 1]);
+            }
+
             lastblock_remains = false;
           }
 
