@@ -1,6 +1,8 @@
 mkfile_path = $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
+DFLAGS=
+
 EXECUTABLE=bethela
 INSTALLPATH=/usr/local/bin
 RBUFFER_FLAG=
@@ -79,7 +81,7 @@ environment:
 
 compile:
 	@echo $(COMPILATION_MSG)
-	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(RBUFFER_FLAG) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
+	$(CXX) $(LINKER) $(CXX_STANDARD) main.cpp -o $(EXECUTABLE) $(DFLAGS) $(RBUFFER_FLAG) $(VERSION_FLAGS) $(THREADING) $(CXX_FLAGS)
 
 install:
 ifeq ($(OS), Linux)
