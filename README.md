@@ -118,3 +118,11 @@ bethela --dec-AES256-replace keyfile file1.bthl file2.bthl ... fileN.bthl
 ```
 bethela --help
 ```
+
+-----
+
+### External Libraries
+
+- [AES](https://github.com/mrdcvlsc/AES) - for AES encryption with hardware acceleration support.
+- [BytePadding](https://github.com/mrdcvlsc/BytePadding) - for simple padding operations.
+- [BlockCipherModes](https://github.com/mrdcvlsc/BlockCipherModes) - for block cipher encryption modes.

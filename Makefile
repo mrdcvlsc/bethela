@@ -7,60 +7,60 @@ EXECUTABLE=bethela
 INSTALLPATH=/usr/local/bin
 RBUFFER_FLAG=
 
-OS := $(shell uname)
+OS:=$(shell uname)
 
 CXX:=g++
-CXX_STANDARD=-std=c++17
+CXX_STANDARD:=-std=c++17
 
 ifeq ($(CXX), clang++)
-THREADING=
+THREADING:=
 else
-THREADING=
+THREADING:=
 endif
 
-TYPE=release
-VERSION=portable
-LINK=dynamic
+TYPE:=release
+VERSION:=portable
+LINK:=dynamic
 
 ifeq ($(LINK), dynamic)
-LINKER=
+LINKER:=
 else ifeq ($(LINK), static)
-LINKER=-static
+LINKER:=-static
 endif
 
 ifeq ($(CXX), clang++)
-ADDRESS_SANITIZER=-fsanitize=address
-THREADS_SANITIZER=-fsanitize=thread
+ADDRESS_SANITIZER:=-fsanitize=address
+THREADS_SANITIZER:=-fsanitize=thread
 else
-ADDRESS_SANITIZER=
-THREADS_SANITIZER=
+ADDRESS_SANITIZER:=
+THREADS_SANITIZER:=
 endif
 
 ifeq ($(TYPE), release)
-CXX_FLAGS=-O3 -Wall -Wextra
+CXX_FLAGS:=-O3 -Wall -Wextra
 else ifeq ($(TYPE), release2)
-CXX_FLAGS=-O2 -Wall -Wextra
+CXX_FLAGS:=-O2 -Wall -Wextra
 else ifeq ($(TYPE), tune)
-CXX_FLAGS=-O3 -march=native -mtune=native -mcpu=native -Wall -Wextra
+CXX_FLAGS:=-O3 -march=native -mtune=native -mcpu=native -Wall -Wextra
 else ifeq ($(TYPE), debug)
-CXX_FLAGS=-O2 -Wall -Wextra $(ADDRESS_SANITIZER)
+CXX_FLAGS:=-O2 -Wall -Wextra $(ADDRESS_SANITIZER)
 else ifeq ($(TYPE), debug_threads)
-CXX_FLAGS=-O2 -Wall -Wextra $(THREADS_SANITIZER)
+CXX_FLAGS:=-O2 -Wall -Wextra $(THREADS_SANITIZER)
 endif
 
 ifeq ($(VERSION), portable)
 COMPILATION_MSG="compiling portable version"
-VERSION_FLAGS=
+VERSION_FLAGS:=-DUSE_CXX_AES
 else ifeq ($(VERSION), aesni)
 COMPILATION_MSG="compiling AES-NI version"
-VERSION_FLAGS=-DUSE_AESNI -D_USE_INTEL_AESNI -maes
+VERSION_FLAGS:=-DUSE_AESNI -DUSE_INTEL_AESNI -maes
 else ifeq ($(VERSION), neon)
 COMPILATION_MSG="compiling AES aarch64 neon version"
-VERSION_FLAGS=-DUSE_ARM_AES -D_USE_ARM_NEON_AES -march=armv8-a+crypto
+VERSION_FLAGS:=-DUSE_ARM_AES -DUSE_NEON_AES -march=armv8-a+crypto
 endif
 
 ifeq ($(RBUFFER), stack)
-RBUFFER_FLAG=-D_USE_RBUFFER_ON_STACK
+RBUFFER_FLAG:=-D_USE_RBUFFER_ON_STACK
 endif
 
 .PHONY: default environment compile install uninstall encrypt_decrypt randfile checkfile genkeys vig_encrypt_decrypt clean
