@@ -24,7 +24,7 @@
   #define CRYPTOLIB "portable"
 #endif
 
-#define BETHELA_VERSION "version 4.0.1"
+#define BETHELA_VERSION "version 4.0.2"
 
 #define HELP_FLAG "--help"
 #define VERSION_FLAG "--version"
